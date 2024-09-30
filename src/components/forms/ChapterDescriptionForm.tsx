@@ -78,7 +78,7 @@ const ChapterDescriptionForm = ({
       toggleEdit();
       toast.success('Chapter updated');
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong');
     }
   }

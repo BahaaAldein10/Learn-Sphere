@@ -23,6 +23,7 @@ type Course = {
   updatedAt: Date;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formSchema = z.object({
   imageUrl: z.string().url('Invalid URL format'),
 });
@@ -51,7 +52,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
       toggleEdit();
       toast.success('Course updated');
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong');
     }
   }

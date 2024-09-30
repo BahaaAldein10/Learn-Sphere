@@ -36,6 +36,7 @@ interface ChapterVideoFormProps {
   chapterId: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formSchema = z.object({
   videoUrl: z.string().min(1),
 });
@@ -64,7 +65,7 @@ const ChapterVideoForm = ({
       toggleEdit();
       toast.success('Chapter updated');
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong');
     }
   };

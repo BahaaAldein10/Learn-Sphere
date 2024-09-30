@@ -84,7 +84,7 @@ const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
 
       toast.success('Chapters reordered');
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong');
     } finally {
       setIsUpdating(false);

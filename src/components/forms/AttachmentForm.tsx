@@ -21,6 +21,7 @@ type Attachment = {
   updatedAt: Date;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formSchema = z.object({
   url: z
     .string()
@@ -68,7 +69,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
       toggleEdit();
       toast.success('Attachment created');
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong');
     }
   }
