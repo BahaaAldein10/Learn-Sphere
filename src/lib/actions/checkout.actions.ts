@@ -2,7 +2,7 @@
 
 import { currentUser } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
-import prisma from '../prisma';
+import prisma from '../db';
 import { stripe } from '../stripe';
 
 interface CheckoutParams {
