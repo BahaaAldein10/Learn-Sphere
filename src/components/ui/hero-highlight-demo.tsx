@@ -46,7 +46,7 @@ export function HeroHighlightDemo() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.5 }}
-            className="rounded-lg bg-purple-700 px-6 py-3 font-semibold text-white shadow-lg transition-transform hover:scale-105"
+            className="rounded-lg bg-purple-700 px-6 py-3 font-semibold text-white shadow-lg transition-transform"
           >
             Get Started
           </motion.button>

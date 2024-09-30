@@ -30,7 +30,7 @@ export const StudentSidebarLinks = [
   },
   {
     label: 'AI Chatbot',
-    route: '/ai_Chatbot',
+    route: '/ai_chatbot',
     Icon: Bot,
   },
 ];
@@ -48,13 +48,18 @@ export const TeacherSidebarLinks = [
   },
   {
     label: 'Forum',
-    route: '/forum',
+    route: '/teacher/forum',
     Icon: MessageCircle,
   },
   {
     label: 'Collaboration',
-    route: '/collaboration',
+    route: '/teacher/collaboration',
     Icon: Users,
+  },
+  {
+    label: 'AI Chatbot',
+    route: '/teacher/ai_chatbot',
+    Icon: Bot,
   },
 ];
 
