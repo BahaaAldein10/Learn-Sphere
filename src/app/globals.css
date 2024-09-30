@@ -85,3 +85,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ShadCN UI */
+.no-focus {
+  @apply border-none focus:border-none ring-0 ring-offset-0 focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0 !important;
+}
+
+/* Clerk */
+.cl-internal-1dauvpw,
+.cl-internal-1hp5nqm {
+  @apply hidden;
+}
+
+.cl-formButtonPrimary {
+  @apply bg-purple-800 hover:bg-purple-800/90;
+}
+
+.cl-avatarBox {
+  @apply size-8;
+}
+
+/* Uploadthing */
+.UploadDropZone {
+  @apply ut-button:bg-purple-700 ut-button:ut-readying:bg-purple-700/50 ut-label:text-purple-700;
+}
+
+/* React Quill */
+.ql-container {
+  @apply text-base !important;
+}
