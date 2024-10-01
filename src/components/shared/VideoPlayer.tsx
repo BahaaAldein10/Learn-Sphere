@@ -14,6 +14,7 @@ interface VideoPlayerProps {
   chapterId: string;
   nextChapterId?: string;
   isLocked: boolean;
+  isCompleted: boolean;
   title: string;
 }
 
@@ -22,6 +23,7 @@ const VideoPlayer = ({
   courseId,
   nextChapterId,
   videoUrl,
+  isCompleted,
   isLocked,
 }: VideoPlayerProps) => {
   const [isReady, setIsReady] = useState(false);
@@ -32,28 +34,29 @@ const VideoPlayer = ({
   if (!userId) return redirect('/');
 
   const handleEnd = async () => {
-    try {
-      await updateProgress({
-        userId,
-        chapterId,
-        isCompleted: true,
-      });
+    if (isCompleted)
+      try {
+        await updateProgress({
+          userId,
+          chapterId,
+          isCompleted: true,
+        });
 
-      if (!nextChapterId) {
-        confetti.onOpen();
-      }
+        if (!nextChapterId) {
+          confetti.onOpen();
+        }
 
-      toast.success('Progress updated');
-      router.refresh();
-
-      if (nextChapterId) {
-        router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
+        toast.success('Progress updated');
         router.refresh();
+
+        if (nextChapterId) {
+          router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
+          router.refresh();
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error('Something went wrong');
       }
-    } catch (error) {
-      console.log(error);
-      toast.error('Something went wrong');
-    }
   };
 
   return (

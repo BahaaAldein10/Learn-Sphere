@@ -35,6 +35,7 @@ const ChapterId = async ({
   });
 
   const isLocked = !purchase && !chapter?.isFree;
+  const isCompleted = !!purchase && !userProgress?.isCompleted;
 
   return (
     <div>
@@ -56,6 +57,7 @@ const ChapterId = async ({
             nextChapterId={nextChapter?.id}
             videoUrl={videoUrl as string}
             isLocked={isLocked}
+            isCompleted={isCompleted}
           />
         </div>
         <div>
