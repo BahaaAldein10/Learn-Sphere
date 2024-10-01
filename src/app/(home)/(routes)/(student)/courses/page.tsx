@@ -1,15 +1,17 @@
 import CourseCard from '@/components/shared/CourseCard';
 import { getAllCourses } from '@/lib/actions/course.actions';
+import { SearchParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
-const Courses = async () => {
+const Courses = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
-  if (!userId) return redirect('/sign-in');
+  if (!userId) return redirect('/');
 
   const courses = await getAllCourses({
     userId,
+    searchQuery: searchParams.q,
   });
 
   return (

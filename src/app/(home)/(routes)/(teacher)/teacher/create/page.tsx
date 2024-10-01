@@ -15,7 +15,7 @@ import { createCourse, findLastCourse } from '@/lib/actions/course.actions';
 import { useAuth } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
@@ -31,7 +31,7 @@ const CreateCourse = () => {
   const router = useRouter();
   const { userId } = useAuth();
 
-  if (!userId) router.push('/sign-in');
+  if (!userId) redirect('/');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

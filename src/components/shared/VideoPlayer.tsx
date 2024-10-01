@@ -1,33 +1,28 @@
 'use client';
 
 import { updateProgress } from '@/lib/actions/chapter.actions';
-import { cn } from '@/lib/utils';
 import { useConfettiStore } from '@/store/confettiStore';
 import { useAuth } from '@clerk/nextjs';
-import MuxPlayer from '@mux/mux-player-react';
 import { Loader2, Lock } from 'lucide-react';
 import { redirect, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 interface VideoPlayerProps {
-  playbackId?: string | null;
+  videoUrl: string;
   courseId: string;
   chapterId: string;
   nextChapterId?: string;
   isLocked: boolean;
-  completeOnEnd: boolean;
   title: string;
 }
 
 const VideoPlayer = ({
   chapterId,
-  title,
   courseId,
   nextChapterId,
-  playbackId,
+  videoUrl,
   isLocked,
-  completeOnEnd,
 }: VideoPlayerProps) => {
   const [isReady, setIsReady] = useState(false);
   const router = useRouter();
@@ -38,23 +33,22 @@ const VideoPlayer = ({
 
   const handleEnd = async () => {
     try {
-      if (completeOnEnd) {
-        await updateProgress({
-          userId,
-          chapterId,
-          isCompleted: true,
-        });
+      await updateProgress({
+        userId,
+        chapterId,
+        isCompleted: true,
+      });
 
-        if (!nextChapterId) {
-          confetti.onOpen();
-        }
+      if (!nextChapterId) {
+        confetti.onOpen();
+      }
 
-        toast.success('Progress updated');
+      toast.success('Progress updated');
+      router.refresh();
+
+      if (nextChapterId) {
+        router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
         router.refresh();
-
-        if (nextChapterId) {
-          router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
-        }
       }
     } catch (error) {
       console.log(error);
@@ -75,14 +69,13 @@ const VideoPlayer = ({
           <p className="text-sm">This chapter is locked</p>
         </div>
       )}
-      {!isLocked && playbackId && (
-        <MuxPlayer
-          playbackId={playbackId}
-          onEnded={handleEnd}
-          title={title}
-          className={cn(!isReady && 'hidden')}
+      {!isLocked && videoUrl && (
+        <video
+          src={videoUrl}
+          controls
           onCanPlay={() => setIsReady(true)}
-          autoPlay
+          onEnded={handleEnd}
+          className={`size-full ${!isReady && 'hidden'}`}
         />
       )}
     </div>

@@ -9,7 +9,9 @@ import SearchInput from './SearchInput';
 
 const Navbar = () => {
   const pathname = usePathname();
-  const teacherMode = pathname.includes('/teacher');
+  const teacherMode =
+    pathname.includes('/teacher') ||
+    (pathname.includes('/courses') && pathname.includes('/chapters'));
 
   return (
     <nav

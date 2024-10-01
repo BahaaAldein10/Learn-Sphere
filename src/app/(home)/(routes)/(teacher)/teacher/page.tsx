@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
+
 const TeacherPage = () => {
-  return <div>TeacherPage</div>;
+  return redirect('/teacher/courses')
 };
 
 export default TeacherPage;

@@ -274,14 +274,13 @@ export async function getChapter(params: GetChapterParams) {
         courseId,
       },
       include: {
-        muxData: true,
         userProgress: true,
       },
     });
 
     if (!course || !chapter) throw new Error('Course or Chapter not found!');
 
-    let muxData = null;
+    const videoUrl = chapter.videoUrl;
     let attachments: Attachment[] = [];
     let nextChapter: Chapter | null = null;
 
@@ -294,15 +293,8 @@ export async function getChapter(params: GetChapterParams) {
     }
 
     if (chapter.isFree || purchase) {
-      muxData = await prisma.muxData.findUnique({
-        where: {
-          chapterId,
-        },
-      });
-
       nextChapter = await prisma.chapter.findFirst({
         where: {
-          id: chapterId,
           courseId,
           isPublished: true,
           position: {
@@ -313,7 +305,6 @@ export async function getChapter(params: GetChapterParams) {
           position: 'asc',
         },
       });
-      console.log(nextChapter?.id);
     }
 
     const userProgress = await prisma.userProgress.findUnique({
@@ -327,23 +318,23 @@ export async function getChapter(params: GetChapterParams) {
 
     return {
       chapter,
-      muxData,
       userProgress,
       nextChapter,
       attachments,
       purchase,
       course,
+      videoUrl,
     };
   } catch (error) {
     console.log(error);
     return {
       chapter: null,
       course: null,
-      muxData: null,
-      attachments: [],
-      nextChapter: null,
       userProgress: null,
+      nextChapter: null,
+      attachments: [],
       purchase: null,
+      videoUrl: null,
     };
   }
 }

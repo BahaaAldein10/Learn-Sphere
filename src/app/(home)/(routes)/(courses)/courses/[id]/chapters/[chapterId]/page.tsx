@@ -22,12 +22,12 @@ const ChapterId = async ({
 
   const {
     chapter,
-    muxData,
     userProgress,
     nextChapter,
     attachments,
     purchase,
     course,
+    videoUrl,
   } = await getChapter({
     chapterId,
     courseId: id,
@@ -35,7 +35,6 @@ const ChapterId = async ({
   });
 
   const isLocked = !purchase && !chapter?.isFree;
-  const completeOnEnd = !!purchase && !userProgress?.isCompleted;
 
   return (
     <div>
@@ -55,9 +54,8 @@ const ChapterId = async ({
             title={chapter?.title as string}
             courseId={params.id}
             nextChapterId={nextChapter?.id}
-            playbackId={muxData?.playbackId}
+            videoUrl={videoUrl as string}
             isLocked={isLocked}
-            completeOnEnd={completeOnEnd}
           />
         </div>
         <div>

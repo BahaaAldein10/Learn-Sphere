@@ -31,6 +31,7 @@ export interface CreateCourseParams {
 
 export interface GetAllCoursesParams {
   userId: string;
+  searchQuery?: string;
 }
 
 export interface FindLastCourseParams {

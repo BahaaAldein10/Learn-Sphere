@@ -124,11 +124,16 @@ export async function getCourse(params: GetCourseParams) {
 
 export async function getAllCourses(params: GetAllCoursesParams) {
   try {
-    const { userId } = params;
+    const { userId, searchQuery } = params;
 
     const courses = await prisma.course.findMany({
       where: {
         isPublished: true,
+        ...(searchQuery && {
+          OR: [
+            { name: { contains: searchQuery, mode: 'insensitive' } },
+          ],
+        }),
       },
       include: {
         category: true,
