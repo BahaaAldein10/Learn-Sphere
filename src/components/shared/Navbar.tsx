@@ -12,10 +12,13 @@ const Navbar = () => {
   const teacherMode =
     pathname.includes('/teacher') ||
     (pathname.includes('/courses') && pathname.includes('/chapters'));
+  const isNotRootPath = pathname !== '/';
+  const isCourseOrChapter =
+    pathname.includes('/courses') && pathname.includes('/chapters') && !pathname.startsWith('/teacher');
 
   return (
     <nav
-      className={`flex size-full items-center ${pathname !== '/' && 'border-b shadow-sm'} bg-white p-4 text-gray-900`}
+      className={`flex size-full items-center ${isNotRootPath && !isCourseOrChapter && 'border-b shadow-sm'} bg-white p-4 text-gray-900`}
     >
       <div className="flex-between w-full">
         {pathname === '/courses' ? (
@@ -38,6 +41,8 @@ const Navbar = () => {
           <UserButton />
         </div>
       </div>
+
+      
     </nav>
   );
 };
