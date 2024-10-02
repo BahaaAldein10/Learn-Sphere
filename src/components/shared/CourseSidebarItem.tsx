@@ -43,17 +43,21 @@ export const CourseSidebarItem = ({
       )}
     >
       <div
-        className={cn('flex-center gap-2 py-4', isActive && 'text-purple-900')}
+        className={cn(
+          'flex-center gap-2 py-4',
+          isActive && 'text-purple-900 font-semibold',
+          isCompleted && 'text-emerald-700'
+        )}
       >
         <Icon
           size={22}
           className={cn(
             'text-slate-500',
             isActive && 'text-purple-900',
-            isCompleted && 'text-emerald-700 dark:text-emerald-400'
+            isCompleted && 'text-emerald-700'
           )}
         />
-        <span className='text-left'>{label}</span>
+        <span className="text-left">{label}</span>
       </div>
       <div
         className={cn(

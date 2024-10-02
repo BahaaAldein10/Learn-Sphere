@@ -18,9 +18,9 @@ export async function createChapter(params: CreateChapterParams) {
   try {
     const { title, courseId } = params;
 
-    const chapterPosition = await prisma.chapter.findFirst({
+    const lastChapterPosition = await prisma.chapter.findFirst({
       where: {
-        id: courseId,
+        courseId,
       },
       orderBy: {
         position: 'desc',
@@ -30,7 +30,7 @@ export async function createChapter(params: CreateChapterParams) {
     const chapter = await prisma.chapter.create({
       data: {
         title,
-        position: chapterPosition ? chapterPosition.position + 1 : 1,
+        position: lastChapterPosition ? lastChapterPosition.position + 1 : 1,
         courseId,
       },
     });
