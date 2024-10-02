@@ -42,21 +42,23 @@ export const CourseSidebarItem = ({
         isCompleted && isActive && 'bg-emerald-200/20 dark:bg-emerald-300/20'
       )}
     >
-      <div className="flex items-center gap-x-2 py-4">
+      <div
+        className={cn('flex-center gap-2 py-4', isActive && 'text-purple-900')}
+      >
         <Icon
           size={22}
           className={cn(
             'text-slate-500',
-            isActive && 'text-slate-700 dark:text-slate-300',
+            isActive && 'text-purple-900',
             isCompleted && 'text-emerald-700 dark:text-emerald-400'
           )}
         />
-        {label}
+        <span className='text-left'>{label}</span>
       </div>
       <div
         className={cn(
           'ml-auto opacity-0 border-2 border-slate-700 h-full transition-all',
-          isActive && 'opacity-100 border-purple-700', // Changed border color
+          isActive && 'opacity-100 border-purple-900',
           isCompleted && 'border-emerald-700'
         )}
       />
