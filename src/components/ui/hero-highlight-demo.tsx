@@ -31,7 +31,7 @@ export function HeroHighlightDemo() {
           duration: 0.5,
           ease: [0.4, 0.0, 0.2, 1],
         }}
-        className="mx-auto mt-20 max-w-5xl px-4 text-center text-2xl font-bold leading-relaxed text-purple-900 md:text-4xl lg:text-5xl lg:leading-snug"
+        className="mx-auto mt-20 max-w-5xl px-4 text-center text-3xl font-bold leading-relaxed text-purple-900 md:text-4xl lg:text-5xl lg:leading-snug"
       >
         Unlock the power of learning through{' '}
         <Highlight className="text-purple-800">
