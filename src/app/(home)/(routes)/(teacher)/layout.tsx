@@ -12,11 +12,11 @@ export default function AppLayout({
     <>
       <SignedIn>
         <div className="h-full">
-          <div className="fixed inset-y-0 z-50 h-20 w-full md:pl-56">
+          <div className="fixed inset-y-0 z-10 h-20 w-full md:pl-56">
             <Navbar />
           </div>
 
-          <div className="fixed inset-y-0 z-50 hidden h-full w-56 flex-col md:flex">
+          <div className="fixed inset-y-0 z-10 hidden h-full w-56 flex-col md:flex">
             <Sidebar />
           </div>
 

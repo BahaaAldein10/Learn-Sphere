@@ -96,7 +96,6 @@ export interface UpdateChapterFormParams {
   chapterId: string;
   courseId: string;
   values: ChapterUpdateValues;
-  videoUrl?: string;
 }
 
 export interface DeleteChapterParams {

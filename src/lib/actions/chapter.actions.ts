@@ -11,14 +11,8 @@ import {
   UpdateChapterParams,
   UpdateProgressParams,
 } from '@/types';
-import Mux from '@mux/mux-node';
 import { Attachment, Chapter } from '@prisma/client';
 import { NextResponse } from 'next/server';
-
-const { video } = new Mux({
-  tokenId: process.env.MUX_TOKEN_ID,
-  tokenSecret: process.env.MUX_SECRET_KEY,
-});
 
 export async function createChapter(params: CreateChapterParams) {
   try {
@@ -67,7 +61,7 @@ export async function updateChapter(params: UpdateChapterParams) {
 }
 
 export async function updateChapterForm(params: UpdateChapterFormParams) {
-  const { chapterId, courseId, values, videoUrl } = params;
+  const { chapterId, courseId, values } = params;
 
   try {
     const chapter = await prisma.chapter.update({
@@ -79,37 +73,6 @@ export async function updateChapterForm(params: UpdateChapterFormParams) {
         ...values,
       },
     });
-
-    if (values) {
-      const existingMuxData = await prisma.muxData.findFirst({
-        where: {
-          chapterId,
-        },
-      });
-
-      if (existingMuxData) {
-        await video.assets.delete(existingMuxData.assetId);
-        await prisma.muxData.delete({
-          where: {
-            id: existingMuxData.id,
-          },
-        });
-      }
-
-      const asset = await video.assets.create({
-        input: [{ url: videoUrl }],
-        playback_policy: ['public'],
-        test: false,
-      });
-
-      await prisma.muxData.create({
-        data: {
-          chapterId,
-          assetId: asset.id,
-          playbackId: asset.playback_ids?.[0]?.id,
-        },
-      });
-    }
 
     return chapter;
   } catch (error) {
@@ -129,24 +92,6 @@ export async function deleteChapter(params: DeleteChapterParams) {
     });
 
     if (!chapter) return new NextResponse('Chapter not found', { status: 404 });
-
-    if (chapter.videoUrl) {
-      const existingMuxData = await prisma.muxData.findFirst({
-        where: {
-          chapterId,
-        },
-      });
-
-      if (existingMuxData) {
-        await video.assets.delete(existingMuxData.assetId);
-        await prisma.muxData.delete({
-          where: {
-            id: existingMuxData?.id,
-            chapterId,
-          },
-        });
-      }
-    }
 
     const deletedChapter = await prisma.chapter.delete({
       where: {

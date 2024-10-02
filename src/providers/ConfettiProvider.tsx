@@ -11,7 +11,7 @@ const ConfettiProvider = () => {
   return (
     <Confetti
       className="pointer-events-none z-50"
-      numberOfPieces={500}
+      numberOfPieces={800}
       recycle={false}
       onConfettiComplete={onClose}
     />

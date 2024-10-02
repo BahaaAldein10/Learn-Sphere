@@ -6,11 +6,7 @@ const isProtectedRoute = createRouteMatcher([
   '/forum(.*)',
   '/collaboration(.*)',
   '/ai_chatbot(.*)',
-  '/teacher/courses(.*)',
-  '/teacher/analytics(.*)',
-  '/teacher/forum(.*)',
-  '/teacher/collaboration(.*)',
-  '/teacher/ai_chatbot(.*)',
+  '/teacher(.*)',
 ]);
 
 export default clerkMiddleware((auth, req) => {

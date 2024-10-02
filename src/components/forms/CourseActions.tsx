@@ -3,7 +3,7 @@
 import { deleteCourse, publishCourse } from '@/lib/actions/course.actions';
 import { useConfettiStore } from '@/store/confettiStore';
 import { Trash } from 'lucide-react';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../shared/ConfirmModal';
@@ -59,7 +59,7 @@ const CourseActions = ({
       });
 
       toast.success('Course deleted');
-      redirect(`/teacher/courses`);
+      router.push(`/teacher/courses`);
     } catch (error) {
       console.log(error);
       toast.error('Something went wrong');

@@ -1,7 +1,7 @@
+import { Chapter, Course, UserProgress } from '@prisma/client';
 import { Menu, Sheet } from 'lucide-react';
 import { SheetContent, SheetTrigger } from '../ui/sheet';
 import { CourseSidebar } from './CourseSidebar';
-import { Course, Chapter, UserProgress } from '@prisma/client';
 
 interface CourseMobileSidebarProps {
   course: Course & {

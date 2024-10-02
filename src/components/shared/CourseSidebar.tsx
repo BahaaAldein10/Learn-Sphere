@@ -1,9 +1,9 @@
 import prisma from '@/lib/db';
 import { auth } from '@clerk/nextjs/server';
+import { Chapter, Course, UserProgress } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { CourseProgress } from './CourseProgress';
 import { CourseSidebarItem } from './CourseSidebarItem';
-import { Course, Chapter, UserProgress } from '@prisma/client';
 
 interface CourseSidebarProps {
   course: Course & {

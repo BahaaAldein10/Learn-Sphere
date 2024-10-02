@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { updateChapterForm } from '@/lib/actions/chapter.actions';
-import MuxPlayer from '@mux/mux-player-react';
 import { Pencil, PlusCircle, Video } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -23,15 +22,8 @@ type Chapter = {
   updatedAt: Date;
 };
 
-type MuxData = {
-  id: string;
-  assetId: string;
-  playbackId: string | null;
-  chapterId: string;
-};
-
 interface ChapterVideoFormProps {
-  initialData: Chapter & { muxData?: MuxData | null };
+  initialData: Chapter;
   courseId: string;
   chapterId: string;
 }
@@ -59,7 +51,6 @@ const ChapterVideoForm = ({
         chapterId,
         courseId,
         values,
-        videoUrl: values.videoUrl,
       });
 
       toggleEdit();
@@ -98,8 +89,9 @@ const ChapterVideoForm = ({
           </div>
         ) : (
           <div className="relative mt-2 aspect-video">
-            <MuxPlayer
-              playbackId={initialData?.muxData?.playbackId || ''}
+            <video
+              src={initialData.videoUrl}
+              controls
               className="aspect-video"
             />
           </div>

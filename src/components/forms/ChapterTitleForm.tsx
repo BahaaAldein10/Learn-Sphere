@@ -60,7 +60,7 @@ const ChapterTitleForm = ({
       toggleEdit();
       toast.success('Chapter updated');
       router.refresh();
-    } catch  {
+    } catch {
       toast.error('Something went wrong');
     }
   };

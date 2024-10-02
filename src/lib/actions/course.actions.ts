@@ -14,16 +14,10 @@ import {
   UpdateCourseParams,
 } from '@/types';
 import { auth } from '@clerk/nextjs/server';
-import Mux from '@mux/mux-node';
 import { Category, Chapter, Course, Purchase } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import prisma from '../db';
 import { getProgress } from './chapter.actions';
-
-const { video } = new Mux({
-  tokenId: process.env.MUX_TOKEN_ID,
-  tokenSecret: process.env.MUX_SECRET_KEY,
-});
 
 type CourseWithProgressWithCategory = Course & {
   category: Category;
@@ -130,9 +124,7 @@ export async function getAllCourses(params: GetAllCoursesParams) {
       where: {
         isPublished: true,
         ...(searchQuery && {
-          OR: [
-            { name: { contains: searchQuery, mode: 'insensitive' } },
-          ],
+          OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
         }),
       },
       include: {
@@ -274,34 +266,13 @@ export async function deleteCourse(params: DeleteCourseParams) {
   try {
     const { courseId } = params;
 
-    const course = await prisma.course.findUnique({
-      where: {
-        id: courseId,
-      },
-      include: {
-        chapters: {
-          include: {
-            muxData: true,
-          },
-        },
-      },
-    });
-
-    if (!course) return new NextResponse('course not found', { status: 404 });
-
-    for (const chapter of course?.chapters) {
-      if (chapter.muxData?.assetId) {
-        await video.assets.delete(chapter.muxData.assetId);
-      }
-    }
-
-    const deletedCourse = await prisma.course.delete({
+    const course = await prisma.course.delete({
       where: {
         id: courseId,
       },
     });
 
-    return deletedCourse;
+    return course;
   } catch (error) {
     console.log(error);
   }

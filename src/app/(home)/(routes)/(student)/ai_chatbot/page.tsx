@@ -1,7 +1,5 @@
 const AiChatbot = () => {
-  return (
-    <div>COMING SOON...</div>
-  )
-}
+  return <div>COMING SOON...</div>;
+};
 
-export default AiChatbot
+export default AiChatbot;
