@@ -41,7 +41,9 @@ const SearchInput = ({ placeholder, classes }: SearchInputProps) => {
   }, [searchParams, router, search]);
 
   return (
-    <div className={`flex-center ${classes} rounded-lg bg-gray-100 px-2`}>
+    <div
+      className={`flex-center ${classes} w-full rounded-lg bg-gray-100 px-2`}
+    >
       <Search />
       <Input
         placeholder={placeholder}

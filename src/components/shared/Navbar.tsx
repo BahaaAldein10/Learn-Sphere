@@ -27,7 +27,15 @@ const Navbar = () => {
         <MobileSidebar />
 
         {pathname === '/courses' ? (
-          <SearchInput placeholder="Search for a Course..." />
+          <>
+            <div className="md:hidden">
+              <SearchInput placeholder="Search..." />
+            </div>
+
+            <div className="max-md:hidden">
+              <SearchInput placeholder="Search for a Course..." />
+            </div>
+          </>
         ) : (
           <div />
         )}
