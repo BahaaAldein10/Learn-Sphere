@@ -24,7 +24,7 @@ const Navbar = () => {
       className={`flex size-full items-center ${isNotRootPath && !isCourseOrChapter && 'border-b shadow-sm'} bg-white p-4 text-gray-900`}
     >
       <div className="flex-between w-full">
-        <MobileSidebar />
+        {!isCourseOrChapter && <MobileSidebar />}
 
         {pathname === '/courses' ? (
           <SearchInput placeholder="Search for a Course..." />
