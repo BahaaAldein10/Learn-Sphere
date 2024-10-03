@@ -42,7 +42,7 @@ const SearchInput = ({ placeholder, classes }: SearchInputProps) => {
 
   return (
     <div
-      className={`flex-center ${classes} w-full rounded-lg bg-gray-100 px-2`}
+      className={`flex-center ${classes} rounded-lg bg-gray-100 px-2 max-md:w-full`}
     >
       <Search />
       <Input
