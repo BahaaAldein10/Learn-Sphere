@@ -29,6 +29,28 @@ export async function createUser(params: CreateUserParams) {
   }
 }
 
+export async function updateUser(params: CreateUserParams) {
+  try {
+    const { userId, image_url, username, email_addresses } = params;
+
+    const user = await prisma.user.update({
+      where: {
+        clerkId: userId,
+      },
+      data: {
+        clerkId: userId,
+        picture: image_url,
+        username,
+        email: email_addresses[0].email_address,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 export async function deleteUser(id: string | undefined) {
   try {
     await prisma.user.delete({

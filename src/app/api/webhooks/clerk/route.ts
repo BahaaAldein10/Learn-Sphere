@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { createUser, deleteUser } from '@/lib/actions/user.actions';
+import { createUser, deleteUser, updateUser } from '@/lib/actions/user.actions';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response('Error occured -- no svix headers', {
+    return new Response('Error occurred -- no svix headers', {
       status: 400,
     });
   }
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     }) as WebhookEvent;
   } catch (err) {
     console.error('Error verifying webhook:', err);
-    return new Response('Error occured', {
+    return new Response('Error occurred', {
       status: 400,
     });
   }
@@ -63,6 +63,24 @@ export async function POST(req: Request) {
       });
 
       return new Response('User created', { status: 200 });
+    } catch (error) {
+      console.log(error);
+      return new Response('Error occurred', { status: 500 });
+    }
+  }
+
+  if (eventType === 'user.updated') {
+    try {
+      const { username, image_url, email_addresses, id } = evt.data;
+
+      await updateUser({
+        userId: id,
+        image_url,
+        email_addresses,
+        username: username!,
+      });
+
+      return new Response('User updated', { status: 200 });
     } catch (error) {
       console.log(error);
       return new Response('Error occurred', { status: 500 });

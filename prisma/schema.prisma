@@ -29,6 +29,26 @@ model Course {
   @@index([categoryId])
 }
 
+model Chapter {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  videoUrl    String?
+  position    Int
+  isPublished Boolean @default(false)
+  isFree      Boolean @default(false)
+
+  courseId String @db.ObjectId
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  userProgress UserProgress[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([courseId])
+}
+
 model Category {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   name      String     @unique
@@ -49,26 +69,6 @@ model Attachment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now())
-
-  @@index([courseId])
-}
-
-model Chapter {
-  id          String  @id @default(auto()) @map("_id") @db.ObjectId
-  title       String
-  description String?
-  videoUrl    String?
-  position    Int
-  isPublished Boolean @default(false)
-  isFree      Boolean @default(false)
-
-  courseId String @db.ObjectId
-  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  userProgress UserProgress[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@index([courseId])
 }
@@ -112,20 +112,6 @@ model StripeCustomer {
   updatedAt DateTime @updatedAt
 }
 
-model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId  String @unique
-  username String @unique
-  email    String @unique
-  picture  String
-
-  Answer    Answer[]
-  questions Question[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 model Question {
   id          String  @id @default(auto()) @map("_id") @db.ObjectId
   clerkId     String
@@ -145,24 +131,45 @@ model Question {
 
   answers  Answer[]
   courseId String?  @db.ObjectId
-  User     User?    @relation(fields: [userId], references: [id])
   userId   String?  @db.ObjectId
+  user     User?    @relation(fields: [userId], references: [id])
 
   @@index([clerkId])
 }
 
 model Answer {
-  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   clerkId    String
   content    String
-  questionId String @db.ObjectId
+  questionId String   @db.ObjectId
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId String? @db.ObjectId
+  user   User?   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    String?  @db.ObjectId
 
   @@index([questionId])
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+}
+
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId  String @unique
+  username String @unique
+  email    String @unique
+  picture  String
+
+  role Role @default(STUDENT)
+
+  questions Question[]
+  answers   Answer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
