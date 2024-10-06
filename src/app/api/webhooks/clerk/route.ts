@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { createUser } from '@/lib/actions/user.actions';
+import { deleteUser, upsertUser } from '@/lib/actions/user.actions';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
@@ -51,11 +51,11 @@ export async function POST(req: Request) {
 
   const eventType = evt.type;
 
-  if (eventType === 'user.created') {
+  if (eventType === 'user.created' || eventType === 'user.updated') {
     try {
       const { username, image_url, email_addresses, id } = evt.data;
 
-      await createUser({
+      await upsertUser({
         userId: id,
         image_url,
         email_addresses,
@@ -63,6 +63,19 @@ export async function POST(req: Request) {
       });
 
       return new Response('User created', { status: 200 });
+    } catch (error) {
+      console.log(error);
+      return new Response('Error occurred', { status: 500 });
+    }
+  }
+
+  if (eventType === 'user.deleted') {
+    try {
+      const { id } = evt.data;
+
+      await deleteUser(id!);
+
+      return new Response('User deleted', { status: 200 });
     } catch (error) {
       console.log(error);
       return new Response('Error occurred', { status: 500 });
