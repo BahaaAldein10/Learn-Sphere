@@ -1,15 +1,15 @@
 /* eslint-disable camelcase */
-import { deleteUser, upsertUser } from '@/lib/actions/user.actions';
+import { createUser, deleteUser } from '@/lib/actions/user.actions';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
 
 export async function POST(req: Request) {
-  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+  const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
-  if (!WEBHOOK_SECRET) {
+  if (!CLERK_WEBHOOK_SECRET) {
     throw new Error(
-      'Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local'
+      'Please add CLERK_WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local'
     );
   }
 
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your secret.
-  const wh = new Webhook(WEBHOOK_SECRET);
+  const wh = new Webhook(CLERK_WEBHOOK_SECRET);
 
   let evt: WebhookEvent;
 
@@ -51,11 +51,11 @@ export async function POST(req: Request) {
 
   const eventType = evt.type;
 
-  if (eventType === 'user.created' || eventType === 'user.updated') {
+  if (eventType === 'user.created') {
     try {
       const { username, image_url, email_addresses, id } = evt.data;
 
-      await upsertUser({
+      await createUser({
         userId: id,
         image_url,
         email_addresses,
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     try {
       const { id } = evt.data;
 
-      await deleteUser(id!);
+      await deleteUser(id);
 
       return new Response('User deleted', { status: 200 });
     } catch (error) {

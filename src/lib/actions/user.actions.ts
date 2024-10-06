@@ -10,25 +10,16 @@ interface CreateUserParams {
   }[];
 }
 
-export async function upsertUser(params: CreateUserParams) {
+export async function createUser(params: CreateUserParams) {
   try {
     const { userId, image_url, username, email_addresses } = params;
 
-    const user = await prisma.user.upsert({
-      create: {
+    const user = await prisma.user.create({
+      data: {
         clerkId: userId,
         picture: image_url,
         username,
         email: email_addresses[0].email_address,
-      },
-      update: {
-        clerkId: userId,
-        picture: image_url,
-        username,
-        email: email_addresses[0].email_address,
-      },
-      where: {
-        clerkId: userId,
       },
     });
 
@@ -38,11 +29,11 @@ export async function upsertUser(params: CreateUserParams) {
   }
 }
 
-export async function deleteUser(userId: string) {
+export async function deleteUser(id: string | undefined) {
   try {
     await prisma.user.delete({
       where: {
-        clerkId: userId,
+        clerkId: id,
       },
     });
   } catch (error) {
