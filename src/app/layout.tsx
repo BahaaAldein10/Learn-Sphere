@@ -10,7 +10,7 @@ import { ourFileRouter } from './api/uploadthing/core';
 import './globals.css';
 
 const roboto = Roboto({
-  weight: ['100', '300', '400', '500', '700'],
+  weight: ['300', '400', '500', '700'],
   style: ['normal', 'italic'],
   subsets: ['latin'],
   display: 'swap',

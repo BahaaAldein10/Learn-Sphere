@@ -16,7 +16,7 @@ const Editor = ({ onChange, value }: EditorProps) => {
       theme="snow"
       value={value}
       onChange={onChange}
-      className="min-h-[7.5rem] bg-white"
+      className="bg-white"
     />
   );
 };
