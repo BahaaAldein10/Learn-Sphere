@@ -129,9 +129,7 @@ const AskQuestionForm = ({ categories }: AskQuestionFormProps) => {
                   Question Description <span className="text-red-600">*</span>
                 </FormLabel>
                 <FormControl>
-                  <div className="h-40">
-                    <Editor value={field.value} onChange={field.onChange} />
-                  </div>
+                  <Editor value={field.value} onChange={field.onChange} />
                 </FormControl>
                 <FormDescription className="text-purple-600">
                   Introduce the problem and expand on what you put in the title.

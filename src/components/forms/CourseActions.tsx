@@ -60,6 +60,7 @@ const CourseActions = ({
 
       toast.success('Course deleted');
       router.push(`/teacher/courses`);
+      router.refresh();
     } catch (error) {
       console.log(error);
       toast.error('Something went wrong');
@@ -76,7 +77,7 @@ const CourseActions = ({
         onClick={handlePublish}
         disabled={disabled || isLoading}
       >
-        {isLoading ? 'Processing...' : isPublished ? 'Unpublish' : 'Publish'}
+        {isLoading ? 'Publishing...' : isPublished ? 'Unpublish' : 'Publish'}
       </Button>
 
       <ConfirmModal onDelete={handleDelete} type="course">

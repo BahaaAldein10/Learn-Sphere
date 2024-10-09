@@ -130,9 +130,6 @@ model Question {
   downvotes Int @default(0)
 
   answers  Answer[]
-  courseId String?  @db.ObjectId
-  userId   String?  @db.ObjectId
-  user     User?    @relation(fields: [userId], references: [id])
 
   @@index([clerkId])
 }
@@ -143,9 +140,6 @@ model Answer {
   content    String
   questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  userId String? @db.ObjectId
-  user   User?   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -166,9 +160,6 @@ model User {
   picture  String
 
   role Role @default(STUDENT)
-
-  questions Question[]
-  answers   Answer[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

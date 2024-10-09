@@ -11,6 +11,8 @@ import Link from 'next/link';
 const Forum = async ({ searchParams }: SearchParamsProps) => {
   const questions = await getAllQuestions({
     searchQuery: searchParams.q,
+    filterQuery: searchParams.filter,
+    pageNumber: searchParams.page ? +searchParams.page : 1,
   });
 
   return (

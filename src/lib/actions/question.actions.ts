@@ -1,5 +1,6 @@
 'use server';
 
+import { Prisma } from '@prisma/client';
 import prisma from '../db';
 
 interface CreateQuestionParams {
@@ -13,11 +14,37 @@ interface CreateQuestionParams {
 
 interface GetAllQuestionsParams {
   searchQuery?: string;
+  filterQuery?: string;
+  pageNumber?: number;
+  pageSize?: number;
 }
 
 export async function getAllQuestions(params: GetAllQuestionsParams) {
   try {
-    const { searchQuery } = params;
+    const { searchQuery, filterQuery, pageNumber = 1, pageSize = 10 } = params;
+
+    let orderOptions: Prisma.QuestionOrderByWithRelationInput;
+
+    switch (filterQuery) {
+      case 'most_recent':
+        orderOptions = { createdAt: 'desc' };
+        break;
+      case 'oldest':
+        orderOptions = { createdAt: 'asc' };
+        break;
+      case 'most_voted':
+        orderOptions = { upvotes: 'desc' };
+        break;
+      case 'most_viewed':
+        orderOptions = { views: 'desc' };
+        break;
+      case 'most_answered':
+        orderOptions = { answers: { _count: 'desc' } };
+        break;
+      default:
+        orderOptions = { createdAt: 'desc' };
+        break;
+    }
 
     const questions = await prisma.question.findMany({
       where: {
@@ -32,14 +59,14 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
           ],
         }),
       },
-      take: 10,
-      // skip: (page - 1) * 10,
-      orderBy: { createdAt: 'desc' },
+      take: pageSize,
+      skip: (pageNumber - 1) * pageSize,
+      orderBy: orderOptions,
     });
 
     return questions;
   } catch (error) {
-    console.log(error);
+    console.error('Error fetching questions:', error);
   }
 }
 
