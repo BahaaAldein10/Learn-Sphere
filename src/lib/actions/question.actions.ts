@@ -59,6 +59,9 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
           ],
         }),
       },
+      include: {
+        answers: true,
+      },
       take: pageSize,
       skip: (pageNumber - 1) * pageSize,
       orderBy: orderOptions,

@@ -29,6 +29,7 @@ const CourseCard = ({
           alt={`${name} course image`}
           width={1000}
           height={1000}
+          loading="lazy"
           className="aspect-video select-none object-cover transition-transform duration-300 hover:scale-110"
         />
       </Link>

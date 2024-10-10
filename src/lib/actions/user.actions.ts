@@ -10,6 +10,10 @@ interface CreateUserParams {
   }[];
 }
 
+interface GetUserParams {
+  userId: string;
+}
+
 export async function createUser(params: CreateUserParams) {
   try {
     const { userId, image_url, username, email_addresses } = params;
@@ -58,6 +62,22 @@ export async function deleteUser(id: string | undefined) {
         clerkId: id,
       },
     });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getUser(params: GetUserParams) {
+  try {
+    const { userId } = params;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+    });
+
+    return user;
   } catch (error) {
     console.log(error);
   }

@@ -43,6 +43,11 @@ const Forum = async ({ searchParams }: SearchParamsProps) => {
               title={question.title}
               category={question.categoryId}
               url={question.id}
+              userId={question.clerkId}
+              QuestionAsked={question.createdAt}
+              upvotes={question.upvotes}
+              answers={question.answers}
+              views={question.views}
             />
           ))
         ) : (
