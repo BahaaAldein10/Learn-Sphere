@@ -1,4 +1,5 @@
 import Filter from '@/components/shared/Filter';
+import Pagination from '@/components/shared/Pagination';
 import QuestionCard from '@/components/shared/QuestionCard';
 import SearchInput from '@/components/shared/SearchInput';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const Forum = async ({ searchParams }: SearchParamsProps) => {
-  const questions = await getAllQuestions({
+  const result = await getAllQuestions({
     searchQuery: searchParams.q,
     filterQuery: searchParams.filter,
     pageNumber: searchParams.page ? +searchParams.page : 1,
@@ -36,8 +37,8 @@ const Forum = async ({ searchParams }: SearchParamsProps) => {
       </div>
 
       <div className="mt-10 flex flex-col gap-8">
-        {questions && questions?.length > 0 ? (
-          questions?.map((question, index) => (
+        {result && result.questions?.length > 0 ? (
+          result.questions?.map((question, index) => (
             <QuestionCard
               key={index}
               title={question.title}
@@ -66,6 +67,16 @@ const Forum = async ({ searchParams }: SearchParamsProps) => {
               No questions found. Try searching for a different keyword.
             </p>
           </div>
+        )}
+      </div>
+
+      <div className="mt-10">
+        {result.totalCount > result.pageSize && (
+          <Pagination
+            currentPage={searchParams.page ? +searchParams.page : 1}
+            totalItems={result.totalCount}
+            itemsPerPage={result.pageSize}
+          />
         )}
       </div>
     </section>

@@ -46,30 +46,48 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
         break;
     }
 
-    const questions = await prisma.question.findMany({
-      where: {
-        ...(searchQuery && {
-          OR: [
-            {
-              title: { contains: searchQuery, mode: 'insensitive' },
-            },
-            {
-              description: { contains: searchQuery, mode: 'insensitive' },
-            },
-          ],
-        }),
-      },
-      include: {
-        answers: true,
-      },
-      take: pageSize,
-      skip: (pageNumber - 1) * pageSize,
-      orderBy: orderOptions,
-    });
+    const [questions, totalCount] = await prisma.$transaction([
+      prisma.question.findMany({
+        where: {
+          ...(searchQuery && {
+            OR: [
+              {
+                title: { contains: searchQuery, mode: 'insensitive' },
+              },
+              {
+                description: { contains: searchQuery, mode: 'insensitive' },
+              },
+            ],
+          }),
+        },
+        include: {
+          answers: true,
+        },
+        take: pageSize,
+        skip: (pageNumber - 1) * pageSize,
+        orderBy: orderOptions,
+      }),
 
-    return questions;
+      prisma.question.count({
+        where: {
+          ...(searchQuery && {
+            OR: [
+              {
+                title: { contains: searchQuery, mode: 'insensitive' },
+              },
+              {
+                description: { contains: searchQuery, mode: 'insensitive' },
+              },
+            ],
+          }),
+        },
+      }),
+    ]);
+
+    return { questions, totalCount, pageSize };
   } catch (error) {
     console.error('Error fetching questions:', error);
+    return { questions: [], totalCount: 0, pageSize: 10 };
   }
 }
 
