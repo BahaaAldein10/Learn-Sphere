@@ -33,7 +33,7 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
         orderOptions = { createdAt: 'asc' };
         break;
       case 'most_voted':
-        orderOptions = { upvotes: 'desc' };
+        orderOptions = { likes: 'desc' };
         break;
       case 'most_viewed':
         orderOptions = { views: 'desc' };
@@ -91,6 +91,22 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
   }
 }
 
+export async function getQuestionById({ id }: { id: string }) {
+  try {
+    const question = await prisma.question.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        answers: true,
+      },
+    });
+
+    return question;
+  } catch (error) {
+    console.log(error);
+  }
+}
 export async function createQuestion(params: CreateQuestionParams) {
   try {
     const { values } = params;

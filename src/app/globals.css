@@ -114,3 +114,6 @@
 .ql-container {
   @apply text-base !important;
 }
+.ql-editor {
+  @apply p-0 !important;
+}

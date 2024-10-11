@@ -57,7 +57,7 @@ const QuestionCard = async ({
             alt="profile picture"
             width={32}
             height={32}
-            className="rounded-full border border-gray-300"
+            className="select-none rounded-full border border-gray-300"
           />
           <div className="text-sm">
             <span className="font-medium text-gray-800">{user?.username}</span>
@@ -73,7 +73,7 @@ const QuestionCard = async ({
           <Metric
             icon={<ThumbsUp className="size-4 text-gray-700" />}
             value={upvotes}
-            title="Votes"
+            title="Likes"
             textStyles="text-sm font-medium text-gray-700"
           />
           <Metric

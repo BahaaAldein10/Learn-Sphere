@@ -126,8 +126,8 @@ model Question {
   updatedAt DateTime @updatedAt
 
   views     Int @default(0)
-  upvotes   Int @default(0)
-  downvotes Int @default(0)
+  likes   Int @default(0)
+  disLikes Int @default(0)
 
   answers  Answer[]
 
