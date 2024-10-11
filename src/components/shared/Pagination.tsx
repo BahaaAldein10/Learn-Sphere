@@ -2,6 +2,7 @@
 
 import { formUrlQuery } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 
 interface PaginationProps {
@@ -15,11 +16,27 @@ const Pagination = ({
   itemsPerPage,
   currentPage,
 }: PaginationProps) => {
+  const [maxVisiblePages, setMaxVisiblePages] = useState(5);
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  const maxVisiblePages = 5; // Limit to 5 page numbers
+
+  useEffect(() => {
+    const updateVisiblePages = () => {
+      if (window.innerWidth < 640) {
+        setMaxVisiblePages(3);
+      } else {
+        setMaxVisiblePages(5);
+      }
+    };
+
+    updateVisiblePages();
+
+    window.addEventListener('resize', updateVisiblePages);
+
+    return () => window.removeEventListener('resize', updateVisiblePages);
+  }, []);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -66,7 +83,7 @@ const Pagination = ({
         Previous
       </Button>
 
-      {/* Show "First" button if currentPage > 1 */}
+      {/* Show "First" button on larger screens only */}
       {adjustedStartPage > 1 && (
         <Button
           onClick={() =>
@@ -78,7 +95,7 @@ const Pagination = ({
               })
             )
           }
-          className="mx-1 select-none bg-gray-200 text-gray-800 hover:bg-gray-300"
+          className="mx-1 hidden select-none bg-gray-200 text-gray-800 hover:bg-gray-300 sm:block"
         >
           First
         </Button>
@@ -111,7 +128,7 @@ const Pagination = ({
         );
       })}
 
-      {/* Show "Last" button if endPage < totalPages */}
+      {/* Show "Last" button on larger screens only */}
       {endPage < totalPages && (
         <Button
           onClick={() =>
@@ -123,7 +140,7 @@ const Pagination = ({
               })
             )
           }
-          className="mx-1 select-none bg-gray-200 text-gray-800 hover:bg-gray-300"
+          className="mx-1 hidden select-none bg-gray-200 text-gray-800 hover:bg-gray-300 sm:block"
         >
           Last
         </Button>
