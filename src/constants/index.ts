@@ -66,7 +66,7 @@ export const TeacherSidebarLinks = [
 export const QuestionFilters = [
   { name: 'Most Recent', value: 'most_recent' },
   { name: 'Oldest', value: 'oldest' },
-  { name: 'Most Voted', value: 'most_voted' },
+  { name: 'Most Liked', value: 'most_liked' },
   { name: 'Most Viewed', value: 'most_viewed' },
   { name: 'Most Answered', value: 'most_answered' },
 ];

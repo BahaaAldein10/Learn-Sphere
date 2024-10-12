@@ -14,7 +14,7 @@ interface QuestionCardProps {
   url: string;
   userId: string;
   QuestionAsked: Date;
-  upvotes: number;
+  likes: number;
   answers: Answer[];
   views: number;
 }
@@ -25,7 +25,7 @@ const QuestionCard = async ({
   url,
   userId,
   QuestionAsked,
-  upvotes,
+  likes,
   answers,
   views,
 }: QuestionCardProps) => {
@@ -72,7 +72,7 @@ const QuestionCard = async ({
         <div className="flex items-center gap-4 max-sm:flex-wrap max-sm:gap-2">
           <Metric
             icon={<ThumbsUp className="size-4 text-gray-700" />}
-            value={upvotes}
+            value={likes}
             title="Likes"
             textStyles="text-sm font-medium text-gray-700"
           />

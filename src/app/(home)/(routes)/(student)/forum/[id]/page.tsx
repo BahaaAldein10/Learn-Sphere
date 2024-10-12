@@ -9,11 +9,13 @@ import {
 import { getUser } from '@/lib/actions/user.actions';
 import { timeSinceQuestionAsked } from '@/lib/utils';
 import { ParamsProps } from '@/types';
+import { auth } from '@clerk/nextjs/server';
 import { Eye, MessageCircle, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 
 const QuestionPage = async ({ params }: ParamsProps) => {
   const { id } = params;
+  const { userId } = auth();
 
   const question = await getQuestionById({ id });
   const categoryName = await getCategoryNameById({
@@ -46,7 +48,13 @@ const QuestionPage = async ({ params }: ParamsProps) => {
           </div>
         </div>
 
-        <Likes />
+        <Likes
+          questionId={id}
+          hasLiked={question.likes.some((like) => like.clerkId === userId)}
+          hasDisliked={question.disLikes.some(
+            (disLike) => disLike.clerkId === userId
+          )}
+        />
       </div>
 
       {/* Question Title */}
@@ -68,7 +76,7 @@ const QuestionPage = async ({ params }: ParamsProps) => {
       <div className="mt-4 flex items-center gap-4 max-sm:flex-wrap max-sm:gap-2">
         <Metric
           icon={<ThumbsUp className="size-4 text-gray-700" />}
-          value={question.likes}
+          value={question.likes.length}
           title="Likes"
           textStyles="text-sm font-medium text-gray-700"
         />

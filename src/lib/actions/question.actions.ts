@@ -1,6 +1,7 @@
 'use server';
 
 import { Prisma } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 import prisma from '../db';
 
 interface CreateQuestionParams {
@@ -32,8 +33,8 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
       case 'oldest':
         orderOptions = { createdAt: 'asc' };
         break;
-      case 'most_voted':
-        orderOptions = { likes: 'desc' };
+      case 'most_liked':
+        orderOptions = { likes: { _count: 'desc' } };
         break;
       case 'most_viewed':
         orderOptions = { views: 'desc' };
@@ -62,6 +63,7 @@ export async function getAllQuestions(params: GetAllQuestionsParams) {
         },
         include: {
           answers: true,
+          likes: true,
         },
         take: pageSize,
         skip: (pageNumber - 1) * pageSize,
@@ -99,6 +101,8 @@ export async function getQuestionById({ id }: { id: string }) {
       },
       include: {
         answers: true,
+        likes: true,
+        disLikes: true,
       },
     });
 
@@ -168,6 +172,147 @@ export async function getAllCategories() {
     });
 
     return categories;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+interface LikeQuestionParams {
+  questionId: string;
+  userId: string;
+}
+
+export async function likeQuestion(params: LikeQuestionParams) {
+  try {
+    const { questionId, userId } = params;
+
+    const existingLike = await prisma.like.findUnique({
+      where: {
+        questionId_clerkId: {
+          questionId,
+          clerkId: userId,
+        },
+      },
+    });
+
+    const existingDisLike = await prisma.disLike.findUnique({
+      where: {
+        questionId_clerkId: {
+          questionId,
+          clerkId: userId,
+        },
+      },
+    });
+
+    if (existingDisLike) {
+      await prisma.disLike.delete({
+        where: {
+          questionId_clerkId: {
+            questionId,
+            clerkId: userId,
+          },
+        },
+      });
+    }
+
+    if (existingLike) {
+      await prisma.like.delete({
+        where: {
+          questionId_clerkId: {
+            questionId,
+            clerkId: userId,
+          },
+        },
+      });
+    } else {
+      await prisma.like.create({
+        data: {
+          questionId,
+          clerkId: userId,
+        },
+      });
+    }
+
+    revalidatePath(`/forum/${questionId}`);
+
+    const updatedQuestion = await prisma.question.findUnique({
+      where: {
+        id: questionId,
+      },
+      include: {
+        likes: true,
+      },
+    });
+
+    return updatedQuestion;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function disLikeQuestion(params: LikeQuestionParams) {
+  try {
+    const { questionId, userId } = params;
+
+    const existingDisLike = await prisma.disLike.findUnique({
+      where: {
+        questionId_clerkId: {
+          questionId,
+          clerkId: userId,
+        },
+      },
+    });
+
+    const existingLike = await prisma.like.findUnique({
+      where: {
+        questionId_clerkId: {
+          questionId,
+          clerkId: userId,
+        },
+      },
+    });
+
+    if (existingLike) {
+      await prisma.like.delete({
+        where: {
+          questionId_clerkId: {
+            questionId,
+            clerkId: userId,
+          },
+        },
+      });
+    }
+
+    if (existingDisLike) {
+      await prisma.disLike.delete({
+        where: {
+          questionId_clerkId: {
+            questionId,
+            clerkId: userId,
+          },
+        },
+      });
+    } else {
+      await prisma.disLike.create({
+        data: {
+          questionId,
+          clerkId: userId,
+        },
+      });
+    }
+
+    revalidatePath(`/forum/${questionId}`);
+
+    const updatedQuestion = await prisma.question.findUnique({
+      where: {
+        id: questionId,
+      },
+      include: {
+        likes: true,
+      },
+    });
+
+    return updatedQuestion;
   } catch (error) {
     console.log(error);
   }

@@ -125,11 +125,11 @@ model Question {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  views     Int @default(0)
-  likes   Int @default(0)
-  disLikes Int @default(0)
+  views    Int       @default(0)
+  likes    Like[]
+  disLikes DisLike[]
 
-  answers  Answer[]
+  answers Answer[]
 
   @@index([clerkId])
 }
@@ -163,4 +163,22 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Like {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId    String   @unique
+  questionId String   @db.ObjectId
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, clerkId])
+}
+
+model DisLike {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId    String   @unique
+  questionId String   @db.ObjectId
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, clerkId])
 }

@@ -9,7 +9,7 @@ import { extractRouterConfig } from 'uploadthing/server';
 import { ourFileRouter } from './api/uploadthing/core';
 import './globals.css';
 
-const roboto = Poppins({
+const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
   style: ['normal', 'italic'],
   subsets: ['latin'],
@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={roboto.className}>
+      <body className={poppins.className}>
         <ClerkProvider>
           <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
           {children}
