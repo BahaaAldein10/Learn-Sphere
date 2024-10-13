@@ -56,11 +56,11 @@ const CourseCard = ({
               <div
                 className="absolute h-2 rounded-full bg-purple-700 transition-all duration-300 ease-in-out"
                 style={{ width: `${progress}%` }}
-                aria-label={`Course completion: ${progress}%`}
+                aria-label={`Course completion: ${Math.round(progress)}%`}
               />
             </div>
             <p className="mt-2 text-sm font-medium text-gray-500">
-              {progress}% Complete
+              {Math.round(progress)}% Complete
             </p>
           </div>
         ) : (

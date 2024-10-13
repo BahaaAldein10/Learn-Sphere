@@ -13,6 +13,16 @@ interface CreateQuestionParams {
   };
 }
 
+interface UpdateQuestionParams {
+  values: {
+    clerkId: string;
+    title: string;
+    description: string;
+    categoryId: string;
+  };
+  questionId: string;
+}
+
 interface GetAllQuestionsParams {
   searchQuery?: string;
   filterQuery?: string;
@@ -111,6 +121,7 @@ export async function getQuestionById({ id }: { id: string }) {
     console.log(error);
   }
 }
+
 export async function createQuestion(params: CreateQuestionParams) {
   try {
     const { values } = params;
@@ -122,6 +133,37 @@ export async function createQuestion(params: CreateQuestionParams) {
     });
 
     return question;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function updateQuestion(params: UpdateQuestionParams) {
+  try {
+    const { values, questionId } = params;
+
+    const question = await prisma.question.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        ...values,
+      },
+    });
+
+    return question;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function deleteQuestion(questionId: string) {
+  try {
+    await prisma.question.delete({
+      where: {
+        id: questionId,
+      },
+    });
   } catch (error) {
     console.log(error);
   }

@@ -12,12 +12,12 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import {
-  createQuestion,
   getCategoryIdByName,
+  updateQuestion,
 } from '@/lib/actions/question.actions';
 import { useAuth } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Category } from '@prisma/client';
+import { Category, Question } from '@prisma/client';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -45,20 +45,26 @@ const formSchema = z.object({
   category: z.string().min(1, 'Please select a category'),
 });
 
-interface AskQuestionFormProps {
+interface EditQuestionFormProps {
   categories: Category[];
+  initialData: Question;
+  categoryName: string;
 }
 
-const AskQuestionForm = ({ categories }: AskQuestionFormProps) => {
+const EditQuestionForm = ({
+  categories,
+  initialData,
+  categoryName,
+}: EditQuestionFormProps) => {
   const { userId } = useAuth();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      category: '',
+      title: initialData.title,
+      description: initialData.description,
+      category: categoryName,
     },
   });
 
@@ -73,17 +79,18 @@ const AskQuestionForm = ({ categories }: AskQuestionFormProps) => {
         return;
       }
 
-      await createQuestion({
+      await updateQuestion({
         values: {
           title: values.title,
           description: values.description,
           categoryId,
           clerkId: userId,
         },
+        questionId: initialData.id,
       });
 
-      toast.success('Question created');
-      router.push('/forum');
+      toast.success('Question updated');
+      router.push(`/forum/${initialData.id}`);
     } catch (error) {
       toast.error('Something went wrong.');
       console.error(error);
@@ -92,7 +99,7 @@ const AskQuestionForm = ({ categories }: AskQuestionFormProps) => {
 
   return (
     <section className="max-w-screen-md space-y-6 p-5 sm:p-10">
-      <h1 className="text-2xl font-semibold">Ask a Question</h1>
+      <h1 className="text-2xl font-semibold">Edit Question</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -192,4 +199,4 @@ const AskQuestionForm = ({ categories }: AskQuestionFormProps) => {
   );
 };
 
-export default AskQuestionForm;
+export default EditQuestionForm;

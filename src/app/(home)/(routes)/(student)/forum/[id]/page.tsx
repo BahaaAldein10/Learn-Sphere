@@ -1,3 +1,4 @@
+import LikeActions from '@/components/shared/LikeActions';
 import Likes from '@/components/shared/Likes';
 import Metric from '@/components/shared/Metric';
 import Preview from '@/components/shared/Preview';
@@ -25,36 +26,44 @@ const QuestionPage = async ({ params }: ParamsProps) => {
     userId: question?.clerkId as string,
   });
 
+  const isAuthor = userId === user?.clerkId;
+
   if (!question) throw new Error('Question not found');
 
   return (
     <section className="p-5 sm:p-10">
       {/* User Info Section */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3 text-gray-700">
-          <Image
-            src={user?.picture as string}
-            alt="profile picture"
-            width={32}
-            height={32}
-            className="select-none rounded-full border border-gray-300"
-          />
-          <div className="text-sm">
-            <span className="font-medium text-gray-800">{user?.username}</span>
-            <span className="mx-2 text-gray-500">|</span>
-            <span className="text-gray-500">
-              asked {timeSinceQuestionAsked(question.createdAt)}
-            </span>
+        <div className="flex-center gap-4">
+          <div className="flex items-center gap-3 text-gray-700">
+            <Image
+              src={user?.picture as string}
+              alt="profile picture"
+              width={32}
+              height={32}
+              className="select-none rounded-full border border-gray-300"
+            />
+            <div className="text-sm">
+              <span className="font-medium text-gray-800">
+                {user?.username}
+              </span>
+              <span className="mx-2 text-gray-500">|</span>
+              <span className="text-gray-500">
+                asked {timeSinceQuestionAsked(question.createdAt)}
+              </span>
+            </div>
           </div>
+
+          <Likes
+            questionId={id}
+            hasLiked={question.likes.some((like) => like.clerkId === userId)}
+            hasDisliked={question.disLikes.some(
+              (disLike) => disLike.clerkId === userId
+            )}
+          />
         </div>
 
-        <Likes
-          questionId={id}
-          hasLiked={question.likes.some((like) => like.clerkId === userId)}
-          hasDisliked={question.disLikes.some(
-            (disLike) => disLike.clerkId === userId
-          )}
-        />
+        {isAuthor && <LikeActions questionId={id} />}
       </div>
 
       {/* Question Title */}

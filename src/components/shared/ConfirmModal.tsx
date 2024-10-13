@@ -28,8 +28,8 @@ const ConfirmModal = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            &nbsp;{type}.
+            This action cannot be undone. This will permanently delete your{' '}
+            {type}.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
