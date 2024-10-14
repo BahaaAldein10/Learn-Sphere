@@ -6,8 +6,7 @@ import 'react-quill/dist/quill.snow.css';
 interface EditorProps {
   onChange: (value: string) => void;
   value: string;
-  placeholder: string;
-  className?: string;
+  placeholder?: string;
 }
 
 const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
