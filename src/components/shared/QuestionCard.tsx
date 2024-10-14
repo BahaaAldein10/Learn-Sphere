@@ -1,6 +1,6 @@
 import { getCategoryNameById } from '@/lib/actions/question.actions';
 import { getUser } from '@/lib/actions/user.actions';
-import { timeSinceQuestionAsked } from '@/lib/utils';
+import { formatTimeSince } from '@/lib/utils';
 import { Answer } from '@prisma/client';
 import { Eye, MessageCircle, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
@@ -63,7 +63,7 @@ const QuestionCard = async ({
             <span className="font-medium text-gray-800">{user?.username}</span>
             <span className="mx-2 text-gray-500">|</span>
             <span className="text-gray-500">
-              asked {timeSinceQuestionAsked(QuestionAsked)}
+              asked {formatTimeSince(QuestionAsked)}
             </span>
           </div>
         </div>

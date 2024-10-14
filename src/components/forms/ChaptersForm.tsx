@@ -108,7 +108,7 @@ const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
       toast.success('Chapter created');
       router.refresh();
     } catch (error) {
-      console.log(error);
+      handleError(error);
       toast.error('Something went wrong');
     }
   }

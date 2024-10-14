@@ -64,7 +64,7 @@ export async function createCourse(params: CreateCourseParams) {
 
     return course;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -83,7 +83,7 @@ export async function findLastCourse(params: FindLastCourseParams) {
 
     return course;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -112,7 +112,7 @@ export async function getCourse(params: GetCourseParams) {
 
     return course;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -192,7 +192,7 @@ export async function updateCourse(params: UpdateCourseParams) {
 
     return updatedCourse;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -210,7 +210,7 @@ export async function createAttachment(params: CreateAttachmentParams) {
 
     return attachment;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -239,7 +239,7 @@ export async function deleteAttachment(params: DeleteAttachmentParams) {
 
     return attachment;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -258,7 +258,7 @@ export async function publishCourse(params: PublishCourseParams) {
 
     return publishedCourse;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -274,7 +274,7 @@ export async function deleteCourse(params: DeleteCourseParams) {
 
     return course;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 

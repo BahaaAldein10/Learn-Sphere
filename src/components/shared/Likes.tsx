@@ -29,29 +29,25 @@ const Likes = ({
   const handleLike = async () => {
     if (!userId) return;
 
-    const updatedQuestion = await likeQuestion({
+    setLiked(!hasLiked);
+    setDisliked(false);
+
+    await likeQuestion({
       questionId,
       userId,
     });
-
-    if (updatedQuestion) {
-      setLiked(true);
-      setDisliked(false);
-    }
   };
 
   const handleDislike = async () => {
     if (!userId) return;
 
-    const updatedQuestion = await disLikeQuestion({
+    setDisliked(!disliked);
+    setLiked(false);
+
+    await disLikeQuestion({
       questionId,
       userId,
     });
-
-    if (updatedQuestion) {
-      setDisliked(!disliked);
-      setLiked(false);
-    }
   };
 
   const likeButtonClasses = `

@@ -54,7 +54,7 @@ const VideoPlayer = ({
           router.refresh();
         }
       } catch (error) {
-        console.log(error);
+        handleError(error);
         toast.error('Something went wrong');
       }
   };

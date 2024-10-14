@@ -39,7 +39,7 @@ const ChapterActions = ({
       );
       router.refresh();
     } catch (error) {
-      console.log(error);
+      handleError(error);
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);
@@ -58,7 +58,7 @@ const ChapterActions = ({
       toast.success('Chapter deleted');
       router.push(`/teacher/courses/${courseId}`);
     } catch (error) {
-      console.log(error);
+      handleError(error);
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);

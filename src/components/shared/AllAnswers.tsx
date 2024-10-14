@@ -1,5 +1,5 @@
 import { getAllAnswers } from '@/lib/actions/answer.actions';
-import { timeSinceQuestionAsked } from '@/lib/utils';
+import { formatTimeSince } from '@/lib/utils';
 import { User } from '@prisma/client';
 import Image from 'next/image';
 import Preview from './Preview';
@@ -44,7 +44,7 @@ const AllAnswers = async ({
                 </span>
                 <span className="mx-2 text-gray-500">|</span>
                 <span className="text-gray-500">
-                  answered {timeSinceQuestionAsked(answer.createdAt)}
+                  answered {formatTimeSince(answer.createdAt)}
                 </span>
               </div>
             </div>

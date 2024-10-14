@@ -10,7 +10,7 @@ import {
   getQuestionById,
 } from '@/lib/actions/question.actions';
 import { getUser } from '@/lib/actions/user.actions';
-import { timeSinceQuestionAsked } from '@/lib/utils';
+import { formatTimeSince } from '@/lib/utils';
 import { ParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { Eye, MessageCircle, ThumbsUp } from 'lucide-react';
@@ -48,7 +48,7 @@ const QuestionPage = async ({ params }: ParamsProps) => {
             <span className="font-medium text-gray-800">{user?.username}</span>
             <span className="mx-2 text-gray-500">|</span>
             <span className="text-gray-500">
-              asked {timeSinceQuestionAsked(question.createdAt)}
+              asked {formatTimeSince(question.createdAt)}
             </span>
           </div>
         </div>

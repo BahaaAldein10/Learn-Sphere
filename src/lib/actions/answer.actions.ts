@@ -22,7 +22,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 
     return answer;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -36,6 +36,6 @@ export async function getAllAnswers(questionId: string) {
 
     return answers;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }

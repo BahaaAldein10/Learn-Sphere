@@ -47,7 +47,7 @@ export const formatPrice = (price: number) => {
   }).format(price);
 };
 
-export const timeSinceQuestionAsked = (askedTime: Date): string => {
+export const formatTimeSince = (askedTime: Date): string => {
   const currentDate = new Date();
   const diff = currentDate.getTime() - askedTime.getTime();
 
@@ -65,4 +65,9 @@ export const timeSinceQuestionAsked = (askedTime: Date): string => {
   } else {
     return seconds <= 1 ? `just now` : `${seconds} seconds ago`;
   }
+};
+
+export const handleError = (error: unknown) => {
+  console.error(error);
+  throw new Error(typeof error === 'string' ? error : JSON.stringify(error));
 };

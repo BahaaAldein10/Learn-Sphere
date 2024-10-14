@@ -29,7 +29,7 @@ export async function createUser(params: CreateUserParams) {
 
     return user;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -51,7 +51,7 @@ export async function updateUser(params: CreateUserParams) {
 
     return user;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -63,7 +63,7 @@ export async function deleteUser(id: string | undefined) {
       },
     });
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -79,6 +79,6 @@ export async function getUser(params: GetUserParams) {
 
     return user;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }

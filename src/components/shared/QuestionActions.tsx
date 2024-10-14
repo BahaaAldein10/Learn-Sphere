@@ -8,6 +8,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Button } from '../ui/button';
 import ConfirmModal from './ConfirmModal';
+import { handleError } from '@/lib/utils';
 
 const QuestionActions = ({ questionId }: { questionId: string }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +26,7 @@ const QuestionActions = ({ questionId }: { questionId: string }) => {
       toast.success('Question deleted');
       router.push('/forum');
     } catch (error) {
-      console.log(error);
+      handleError(error);
     } finally {
       setIsLoading(false);
     }

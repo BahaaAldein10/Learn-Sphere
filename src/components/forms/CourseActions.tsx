@@ -8,6 +8,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../shared/ConfirmModal';
 import { Button } from '../ui/button';
+import { handleError } from '@/lib/utils';
 
 interface CourseActionsProps {
   disabled: boolean;
@@ -43,7 +44,7 @@ const CourseActions = ({
 
       router.refresh();
     } catch (error) {
-      console.log(error);
+      handleError(error);
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);
@@ -62,7 +63,7 @@ const CourseActions = ({
       router.push(`/teacher/courses`);
       router.refresh();
     } catch (error) {
-      console.log(error);
+      handleError(error);
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);

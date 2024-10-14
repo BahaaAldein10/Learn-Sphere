@@ -118,7 +118,7 @@ export async function getQuestionById({ id }: { id: string }) {
 
     return question;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -134,7 +134,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
     return question;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -153,7 +153,7 @@ export async function updateQuestion(params: UpdateQuestionParams) {
 
     return question;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -165,7 +165,7 @@ export async function deleteQuestion(questionId: string) {
       },
     });
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -183,7 +183,7 @@ export async function getCategoryIdByName({
 
     return category?.id;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -201,7 +201,7 @@ export async function getCategoryNameById({
 
     return category?.name;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -215,7 +215,7 @@ export async function getAllCategories() {
 
     return categories;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -288,7 +288,7 @@ export async function likeQuestion(params: LikeQuestionParams) {
 
     return updatedQuestion;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -356,6 +356,6 @@ export async function disLikeQuestion(params: LikeQuestionParams) {
 
     return updatedQuestion;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }

@@ -57,7 +57,7 @@ const CreateCourse = () => {
       toast.success('Course created');
     } catch (error) {
       toast.error('Something went wrong');
-      console.log(error);
+      handleError(error);
     }
   }
 

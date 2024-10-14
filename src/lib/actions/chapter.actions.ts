@@ -37,7 +37,7 @@ export async function createChapter(params: CreateChapterParams) {
 
     return chapter;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -56,7 +56,7 @@ export async function updateChapter(params: UpdateChapterParams) {
       });
     }
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -76,7 +76,7 @@ export async function updateChapterForm(params: UpdateChapterFormParams) {
 
     return chapter;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -120,7 +120,7 @@ export async function deleteChapter(params: DeleteChapterParams) {
 
     return deletedChapter;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -158,7 +158,7 @@ export async function publishChapter(params: PublishChapterParams) {
 
     return publishedChapter;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
 
@@ -188,7 +188,7 @@ export async function getProgress(params: GetProgressParams) {
 
     return progressPercentage;
   } catch (error) {
-    console.log(error);
+    handleError(error);
     return 0;
   }
 }
@@ -271,7 +271,7 @@ export async function getChapter(params: GetChapterParams) {
       videoUrl,
     };
   } catch (error) {
-    console.log(error);
+    handleError(error);
     return {
       chapter: null,
       course: null,
@@ -307,6 +307,6 @@ export async function updateProgress(params: UpdateProgressParams) {
 
     return progress;
   } catch (error) {
-    console.log(error);
+    handleError(error);
   }
 }
