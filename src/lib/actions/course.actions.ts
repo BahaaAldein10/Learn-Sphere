@@ -17,6 +17,7 @@ import { auth } from '@clerk/nextjs/server';
 import { Category, Chapter, Course, Purchase } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import prisma from '../db';
+import { handleError } from '../utils';
 import { getProgress } from './chapter.actions';
 
 type CourseWithProgressWithCategory = Course & {

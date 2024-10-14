@@ -7,6 +7,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../shared/ConfirmModal';
 import { Button } from '../ui/button';
+import { handleError } from '@/lib/utils';
 
 interface ChapterActionsProps {
   disabled: boolean;

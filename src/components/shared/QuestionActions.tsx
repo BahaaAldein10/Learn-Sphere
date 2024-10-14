@@ -1,6 +1,7 @@
 'use client';
 
 import { deleteQuestion } from '@/lib/actions/question.actions';
+import { handleError } from '@/lib/utils';
 import { useAuth } from '@clerk/nextjs';
 import { Edit, Trash2 } from 'lucide-react'; // Import Lucide icons
 import { useRouter } from 'next/navigation';
@@ -8,7 +9,6 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { Button } from '../ui/button';
 import ConfirmModal from './ConfirmModal';
-import { handleError } from '@/lib/utils';
 
 const QuestionActions = ({ questionId }: { questionId: string }) => {
   const [isLoading, setIsLoading] = useState(false);

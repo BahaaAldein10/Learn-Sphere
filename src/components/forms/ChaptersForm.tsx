@@ -1,7 +1,7 @@
 'use client';
 
 import { createChapter, updateChapter } from '@/lib/actions/chapter.actions';
-import { cn } from '@/lib/utils';
+import { cn, handleError } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';

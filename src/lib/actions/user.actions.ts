@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import prisma from '../db';
+import { handleError } from '../utils';
 
 interface CreateUserParams {
   userId: string;

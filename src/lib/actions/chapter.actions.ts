@@ -13,6 +13,7 @@ import {
 } from '@/types';
 import { Attachment, Chapter } from '@prisma/client';
 import { NextResponse } from 'next/server';
+import { handleError } from '../utils';
 
 export async function createChapter(params: CreateChapterParams) {
   try {

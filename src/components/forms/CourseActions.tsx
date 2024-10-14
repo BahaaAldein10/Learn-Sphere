@@ -1,6 +1,7 @@
 'use client';
 
 import { deleteCourse, publishCourse } from '@/lib/actions/course.actions';
+import { handleError } from '@/lib/utils';
 import { useConfettiStore } from '@/store/confettiStore';
 import { Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -8,7 +9,6 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import ConfirmModal from '../shared/ConfirmModal';
 import { Button } from '../ui/button';
-import { handleError } from '@/lib/utils';
 
 interface CourseActionsProps {
   disabled: boolean;
