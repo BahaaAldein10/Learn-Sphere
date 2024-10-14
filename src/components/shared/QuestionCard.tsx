@@ -45,7 +45,7 @@ const QuestionCard = async ({
       </Link>
 
       {/* Category Badge */}
-      <Badge className="mt-3 rounded-full bg-purple-100 px-3 py-1 text-purple-700">
+      <Badge className="mt-3 select-none rounded-full bg-purple-100 px-3 py-1 text-purple-700">
         {categoryName}
       </Badge>
 
@@ -69,7 +69,7 @@ const QuestionCard = async ({
         </div>
 
         {/* Metrics Section */}
-        <div className="flex items-center gap-4 max-sm:flex-wrap max-sm:gap-2">
+        <div className="flex select-none items-center gap-4 max-sm:flex-wrap max-sm:gap-2">
           <Metric
             icon={<ThumbsUp className="size-4 text-gray-700" />}
             value={likes}

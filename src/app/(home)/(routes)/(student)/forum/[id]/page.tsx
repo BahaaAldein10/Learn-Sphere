@@ -1,7 +1,9 @@
-import LikeActions from '@/components/shared/LikeActions';
+import AnswerForm from '@/components/forms/AnswerForm';
+import AllAnswers from '@/components/shared/AllAnswers';
 import Likes from '@/components/shared/Likes';
 import Metric from '@/components/shared/Metric';
 import Preview from '@/components/shared/Preview';
+import QuestionActions from '@/components/shared/QuestionActions';
 import { Badge } from '@/components/ui/badge';
 import {
   getCategoryNameById,
@@ -32,28 +34,27 @@ const QuestionPage = async ({ params }: ParamsProps) => {
 
   return (
     <section className="p-5 sm:p-10">
-      {/* User Info Section */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex-center gap-4">
-          <div className="flex items-center gap-3 text-gray-700">
-            <Image
-              src={user?.picture as string}
-              alt="profile picture"
-              width={32}
-              height={32}
-              className="select-none rounded-full border border-gray-300"
-            />
-            <div className="text-sm">
-              <span className="font-medium text-gray-800">
-                {user?.username}
-              </span>
-              <span className="mx-2 text-gray-500">|</span>
-              <span className="text-gray-500">
-                asked {timeSinceQuestionAsked(question.createdAt)}
-              </span>
-            </div>
+      <div className="flex w-full flex-wrap items-center gap-4">
+        {/* User and Date Section */}
+        <div className="flex-center gap-3">
+          <Image
+            src={user?.picture as string}
+            alt="profile picture"
+            width={32}
+            height={32}
+            className="select-none rounded-full"
+          />
+          <div className="text-sm">
+            <span className="font-medium text-gray-800">{user?.username}</span>
+            <span className="mx-2 text-gray-500">|</span>
+            <span className="text-gray-500">
+              asked {timeSinceQuestionAsked(question.createdAt)}
+            </span>
           </div>
+        </div>
 
+        {/* Likes and Action Section */}
+        <div className="flex flex-1 items-center justify-between gap-4">
           <Likes
             questionId={id}
             hasLiked={question.likes.some((like) => like.clerkId === userId)}
@@ -61,9 +62,9 @@ const QuestionPage = async ({ params }: ParamsProps) => {
               (disLike) => disLike.clerkId === userId
             )}
           />
-        </div>
 
-        {isAuthor && <LikeActions questionId={id} />}
+          {isAuthor && <QuestionActions questionId={id} />}
+        </div>
       </div>
 
       {/* Question Title */}
@@ -77,12 +78,12 @@ const QuestionPage = async ({ params }: ParamsProps) => {
       </div>
 
       {/* Category Badge */}
-      <Badge className="mt-3 rounded-full bg-purple-100 px-3 py-1 text-purple-700">
+      <Badge className="mt-3 select-none rounded-full bg-purple-100 px-3 py-1 text-purple-700">
         {categoryName}
       </Badge>
 
       {/* Metrics Section */}
-      <div className="mt-4 flex items-center gap-4 max-sm:flex-wrap max-sm:gap-2">
+      <div className="mt-4 flex select-none items-center gap-4 max-sm:flex-wrap max-sm:gap-2">
         <Metric
           icon={<ThumbsUp className="size-4 text-gray-700" />}
           value={question.likes.length}
@@ -102,6 +103,10 @@ const QuestionPage = async ({ params }: ParamsProps) => {
           textStyles="text-sm font-medium text-gray-700"
         />
       </div>
+
+      <AllAnswers user={user!} questionId={id} />
+
+      <AnswerForm questionId={id} />
     </section>
   );
 };

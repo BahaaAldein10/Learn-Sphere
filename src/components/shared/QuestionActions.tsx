@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import { Button } from '../ui/button';
 import ConfirmModal from './ConfirmModal';
 
-const LikeActions = ({ questionId }: { questionId: string }) => {
+const QuestionActions = ({ questionId }: { questionId: string }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { userId } = useAuth();
   const router = useRouter();
@@ -34,26 +34,26 @@ const LikeActions = ({ questionId }: { questionId: string }) => {
   return (
     <div className="flex items-center gap-4">
       <Button
-        className="flex items-center bg-purple-600 text-white hover:bg-purple-700"
+        className="bg-purple-600 text-white hover:bg-purple-700"
         onClick={() => {
           router.push(`/forum/edit/${questionId}`);
         }}
       >
-        <Edit className="mr-2 size-5" />
-        Edit
+        <Edit className="mr-2 size-5 max-sm:mr-0" />
+        <span className="max-sm:hidden">Edit</span>
       </Button>
 
       <ConfirmModal onDelete={handleDelete} type="question">
         <Button
-          className="flex items-center bg-red-500 text-white hover:bg-red-600"
+          className="bg-red-500 text-white hover:bg-red-600"
           disabled={isLoading}
         >
-          <Trash2 className="mr-2 size-5" />
-          Delete
+          <Trash2 className="mr-2 size-5 max-sm:mr-0" />
+          <span className="max-sm:hidden">Delete</span>
         </Button>
       </ConfirmModal>
     </div>
   );
 };
 
-export default LikeActions;
+export default QuestionActions;

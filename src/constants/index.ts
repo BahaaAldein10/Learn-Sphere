@@ -46,21 +46,6 @@ export const TeacherSidebarLinks = [
     route: '/teacher/analytics',
     Icon: ChartPie,
   },
-  {
-    label: 'Forum',
-    route: '/teacher/forum',
-    Icon: MessageCircle,
-  },
-  {
-    label: 'Collaboration',
-    route: '/teacher/collaboration',
-    Icon: Users,
-  },
-  {
-    label: 'AI Chatbot',
-    route: '/teacher/ai_chatbot',
-    Icon: Bot,
-  },
 ];
 
 export const QuestionFilters = [

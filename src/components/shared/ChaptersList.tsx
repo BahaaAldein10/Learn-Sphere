@@ -100,7 +100,12 @@ const ChaptersList = ({ items, onReorder, onEdit }: ChaptersListProps) => {
 
                     <div className="ml-auto flex items-center gap-x-2 pr-2">
                       {chapter.isFree && <Badge>Free</Badge>}
-                      <Badge className={cn('', chapter.isPublished ? 'bg-primary' : 'bg-slate-700')}>
+                      <Badge
+                        className={cn(
+                          'select-none',
+                          chapter.isPublished ? 'bg-primary' : 'bg-slate-700'
+                        )}
+                      >
                         {chapter.isPublished ? 'Published' : 'Draft'}
                       </Badge>
                       <Pencil

@@ -72,8 +72,8 @@ const Likes = ({
         onClick={handleLike}
         disabled={!userId}
       >
-        <ThumbsUp className="size-6" />
-        <span className="ml-2 text-lg font-medium">Like</span>
+        <ThumbsUp className="size-5" />
+        <span className="ml-2 text-base font-medium">Like</span>
       </Button>
 
       <Button
@@ -82,8 +82,8 @@ const Likes = ({
         onClick={handleDislike}
         disabled={!userId}
       >
-        <ThumbsDown className="size-6" />
-        <span className="ml-2 text-lg font-medium">Dislike</span>
+        <ThumbsDown className="size-5" />
+        <span className="ml-2 text-base font-medium">Dislike</span>
       </Button>
     </div>
   );
