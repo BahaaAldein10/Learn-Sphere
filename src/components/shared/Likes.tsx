@@ -1,6 +1,10 @@
 'use client';
 
-import { disLikeQuestion, likeQuestion } from '@/lib/actions/question.actions';
+import {
+  disLikeQuestion,
+  likeQuestion,
+  viewQuestion,
+} from '@/lib/actions/question.actions';
 import { useAuth } from '@clerk/nextjs';
 import { ThumbsDown, ThumbsUp } from 'lucide-react';
 import { redirect } from 'next/navigation';
@@ -24,7 +28,12 @@ const Likes = ({
     if (!userId) return redirect('/');
     setLiked(hasLiked);
     setDisliked(hasDisliked);
-  }, [hasLiked, hasDisliked, userId]);
+
+    viewQuestion({
+      questionId,
+      userId,
+    });
+  }, [hasLiked, questionId, hasDisliked, userId]);
 
   const handleLike = async () => {
     if (!userId) return;

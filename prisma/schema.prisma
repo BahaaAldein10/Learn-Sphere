@@ -128,7 +128,8 @@ model Question {
   likes    Like[]
   disLikes DisLike[]
 
-  answers Answer[]
+  answers     Answer[]
+  Interaction Interaction[]
 
   @@index([clerkId])
 }
@@ -178,6 +179,19 @@ model DisLike {
   clerkId    String
   questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, clerkId])
+}
+
+model Interaction {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId String
+  action  String
+
+  questionId String?   @db.ObjectId
+  question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 
   @@unique([questionId, clerkId])
 }

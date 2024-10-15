@@ -1,6 +1,6 @@
 'use client';
 
-import { formUrlQuery, removeKeysFromQuery } from '@/lib/utils';
+import { formUrlQueryMulti, removeKeysFromQuery } from '@/lib/utils';
 import { Search } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,26 +20,24 @@ const SearchInput = ({ placeholder, classes }: SearchInputProps) => {
   useEffect(() => {
     const delayDebounceFunction = setTimeout(() => {
       if (search) {
-        const newUrl = formUrlQuery({
+        const newUrl = formUrlQueryMulti({
           params: searchParams.toString(),
-          key: 'q',
-          value: search,
+          queries: [
+            { key: 'q', value: search },
+            { key: 'page', value: null },
+          ],
         });
-
         router.push(newUrl, { scroll: false });
       } else {
         const newUrl = removeKeysFromQuery({
           params: searchParams.toString(),
           keysToRemove: ['q'],
         });
-
         router.push(newUrl, { scroll: false });
       }
-    }, 300);
-
+    }, 500);
     return () => clearTimeout(delayDebounceFunction);
-  }, [searchParams, router, search]);
-
+  }, [search, router, searchParams, query]);
   return (
     <div
       className={`flex-center ${classes} rounded-lg bg-gray-100 px-2 max-md:w-full`}

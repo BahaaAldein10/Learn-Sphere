@@ -360,3 +360,53 @@ export async function disLikeQuestion(params: LikeQuestionParams) {
     handleError(error);
   }
 }
+
+interface ViewQuestionParams {
+  questionId: string;
+  userId: string;
+}
+
+export async function viewQuestion(params: ViewQuestionParams) {
+  try {
+    const { questionId, userId } = params;
+
+    if (!questionId || !userId) {
+      throw new Error('questionId and userId are required.');
+    }
+
+    const existingInteraction = await prisma.interaction.findUnique({
+      where: {
+        questionId_clerkId: {
+          questionId,
+          clerkId: userId,
+        },
+        action: 'view',
+      },
+    });
+
+    if (existingInteraction) {
+      return;
+    } else {
+      await prisma.interaction.create({
+        data: {
+          questionId,
+          clerkId: userId,
+          action: 'view',
+        },
+      });
+
+      await prisma.question.update({
+        where: {
+          id: questionId,
+        },
+        data: {
+          views: { increment: 1 },
+        },
+      });
+    }
+
+    revalidatePath(`/forum/${questionId}`);
+  } catch (error) {
+    handleError(error);
+  }
+}

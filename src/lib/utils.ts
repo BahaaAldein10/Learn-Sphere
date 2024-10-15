@@ -21,6 +21,29 @@ export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
   );
 };
 
+export const formUrlQueryMulti = ({
+  params,
+  queries,
+}: {
+  params: string; // Same as in formUrlQuery
+  queries: { key: string; value: string | null }[]; // Array of queries to add
+}) => {
+  const currentUrl = qs.parse(params);
+  // Add all queries to the current URL
+  queries.forEach(({ key, value }) => {
+    currentUrl[key] = value;
+  });
+  // Return the new URL
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query: currentUrl,
+    },
+    // clear key if value is null
+    { skipNull: true }
+  );
+};
+
 export const removeKeysFromQuery = ({
   params,
   keysToRemove,
