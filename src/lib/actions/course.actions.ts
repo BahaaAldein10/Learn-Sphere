@@ -14,7 +14,7 @@ import {
   UpdateCourseParams,
 } from '@/types';
 import { auth } from '@clerk/nextjs/server';
-import { Category, Chapter, Course, Purchase } from '@prisma/client';
+import { Category, Chapter, Course, Prisma, Purchase } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import prisma from '../db';
 import { handleError } from '../utils';
@@ -119,7 +119,45 @@ export async function getCourse(params: GetCourseParams) {
 
 export async function getAllCourses(params: GetAllCoursesParams) {
   try {
-    const { userId, searchQuery } = params;
+    const { userId, searchQuery, filterQuery } = params;
+
+    let sortOptions: Prisma.CourseOrderByWithRelationInput;
+
+    switch (filterQuery) {
+      case 'most-popular':
+        sortOptions = { purchases: { _count: 'desc' } };
+        break;
+
+      case 'newest':
+        sortOptions = {
+          createdAt: 'desc',
+        };
+        break;
+
+      case 'recommended':
+        sortOptions = {
+          price: 'asc',
+        };
+        break;
+
+      case 'price-low-to-high':
+        sortOptions = {
+          price: 'asc',
+        };
+        break;
+
+      case 'price-high-to-low':
+        sortOptions = {
+          price: 'desc',
+        };
+        break;
+
+      default:
+        sortOptions = {
+          createdAt: 'asc',
+        };
+        break;
+    }
 
     const courses = await prisma.course.findMany({
       where: {
@@ -144,9 +182,7 @@ export async function getAllCourses(params: GetAllCoursesParams) {
           },
         },
       },
-      orderBy: {
-        createdAt: 'asc',
-      },
+      orderBy: sortOptions,
     });
 
     const coursesWithProgress = await Promise.all(
