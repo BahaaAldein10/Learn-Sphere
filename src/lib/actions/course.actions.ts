@@ -136,7 +136,7 @@ export async function getAllCourses(params: GetAllCoursesParams) {
 
       case 'recommended':
         sortOptions = {
-          price: 'asc',
+          createdAt: 'desc',
         };
         break;
 
@@ -421,5 +421,65 @@ export async function getAnalytics(userId: string) {
       totalRevenue: 0,
       totalSales: 0,
     };
+  }
+}
+
+export async function getRecommendations(userId: string) {
+  try {
+    // Get liked questions for the user
+    const likedQuestions = await prisma.like.findMany({
+      where: { clerkId: userId },
+    });
+
+    // Return empty if no likes found
+    if (!likedQuestions.length) return [];
+
+    // Extract unique category IDs from liked questions
+    const likedQuestionIds = likedQuestions.map((q) => q.questionId);
+    const questions = await prisma.question.findMany({
+      where: { id: { in: likedQuestionIds } },
+      select: { categoryId: true },
+    });
+    const uniqueCategoryIds = Array.from(
+      new Set(questions.map((q) => q.categoryId))
+    );
+
+    // Fetch courses for each unique category with necessary relationships
+    const courses = await prisma.course.findMany({
+      where: {
+        categoryId: { in: uniqueCategoryIds },
+        isPublished: true,
+      },
+      include: {
+        category: true,
+        chapters: {
+          where: { isPublished: true },
+          select: { id: true },
+        },
+        purchases: {
+          where: { clerkId: userId },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc', // Ordering courses by newest created
+      },
+    });
+
+    // For each course, determine user progress or null if not purchased
+    const coursesWithProgress = await Promise.all(
+      courses.map(async (course) => {
+        const progressPercentage =
+          course.purchases.length > 0
+            ? await getProgress({ courseId: course.id, userId })
+            : null;
+
+        return { ...course, progress: progressPercentage };
+      })
+    );
+
+    return coursesWithProgress;
+  } catch (error) {
+    handleError(error);
+    return [];
   }
 }

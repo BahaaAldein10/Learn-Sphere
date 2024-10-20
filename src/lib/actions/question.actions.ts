@@ -374,6 +374,15 @@ export async function viewQuestion(params: ViewQuestionParams) {
       throw new Error('questionId and userId are required.');
     }
 
+    await prisma.question.update({
+      where: {
+        id: questionId,
+      },
+      data: {
+        views: { increment: 1 },
+      },
+    });
+
     const existingInteraction = await prisma.interaction.findUnique({
       where: {
         questionId_clerkId: {
@@ -392,15 +401,6 @@ export async function viewQuestion(params: ViewQuestionParams) {
           questionId,
           clerkId: userId,
           action: 'view',
-        },
-      });
-
-      await prisma.question.update({
-        where: {
-          id: questionId,
-        },
-        data: {
-          views: { increment: 1 },
         },
       });
     }
