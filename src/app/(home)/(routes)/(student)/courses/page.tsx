@@ -30,7 +30,7 @@ const Courses = async ({ searchParams }: SearchParamsProps) => {
       <CourseFilters />
 
       <div className="p-6">
-        {courses && courses.length > 0 ? (
+        {courses.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {courses.map((course, index) => (
               <CourseCard

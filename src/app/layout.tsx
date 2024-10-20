@@ -19,6 +19,9 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Learn Sphere',
   description: 'AI-Powered Collaborative Learning Platform',
+  icons: {
+    icon: '/assets/logo.svg',
+  },
 };
 
 export default function RootLayout({
