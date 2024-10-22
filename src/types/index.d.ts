@@ -33,6 +33,8 @@ export interface GetAllCoursesParams {
   userId: string;
   searchQuery?: string;
   filterQuery?: string;
+  pageNumber?: number;
+  pageSize?: number;
 }
 
 export interface FindLastCourseParams {
@@ -160,4 +162,14 @@ export type PurchaseWithCourse2 = {
       isPublished: boolean;
     }[];
   };
+};
+
+export type CourseWithProgress = Course & { progress: number | null } & {
+  category;
+  chapters;
+};
+export type CoursesResult = {
+  coursesWithProgress: CourseWithProgress[];
+  pageSize: number;
+  totalCount: number;
 };

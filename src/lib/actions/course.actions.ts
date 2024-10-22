@@ -1,6 +1,7 @@
 'use server';
 
 import {
+  CoursesResult,
   CreateAttachmentParams,
   CreateCourseParams,
   DeleteAttachmentParams,
@@ -114,102 +115,6 @@ export async function getCourse(params: GetCourseParams) {
     return course;
   } catch (error) {
     handleError(error);
-  }
-}
-
-export async function getAllCourses(params: GetAllCoursesParams) {
-  try {
-    const { userId, searchQuery, filterQuery } = params;
-
-    let sortOptions: Prisma.CourseOrderByWithRelationInput;
-
-    switch (filterQuery) {
-      case 'most-popular':
-        sortOptions = { purchases: { _count: 'desc' } };
-        break;
-
-      case 'newest':
-        sortOptions = {
-          createdAt: 'desc',
-        };
-        break;
-
-      case 'recommended':
-        sortOptions = {
-          createdAt: 'desc',
-        };
-        break;
-
-      case 'price-low-to-high':
-        sortOptions = {
-          price: 'asc',
-        };
-        break;
-
-      case 'price-high-to-low':
-        sortOptions = {
-          price: 'desc',
-        };
-        break;
-
-      default:
-        sortOptions = {
-          createdAt: 'asc',
-        };
-        break;
-    }
-
-    const courses = await prisma.course.findMany({
-      where: {
-        isPublished: true,
-        ...(searchQuery && {
-          OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
-        }),
-      },
-      include: {
-        category: true,
-        chapters: {
-          where: {
-            isPublished: true,
-          },
-          select: {
-            id: true,
-          },
-        },
-        purchases: {
-          where: {
-            clerkId: userId,
-          },
-        },
-      },
-      orderBy: sortOptions,
-    });
-
-    const coursesWithProgress = await Promise.all(
-      courses.map(async (course: CourseWithProgress) => {
-        if (course.purchases.length === 0) {
-          return {
-            ...course,
-            progress: null,
-          };
-        }
-
-        const progressPercentage = await getProgress({
-          courseId: course.id,
-          userId,
-        });
-
-        return {
-          ...course,
-          progress: progressPercentage,
-        };
-      })
-    );
-
-    return coursesWithProgress;
-  } catch (error) {
-    console.error('Error fetching courses:', error);
-    return [];
   }
 }
 
@@ -424,15 +329,136 @@ export async function getAnalytics(userId: string) {
   }
 }
 
-export async function getRecommendations(userId: string) {
+export async function getAllCourses(
+  params: GetAllCoursesParams
+): Promise<CoursesResult> {
   try {
+    const {
+      userId,
+      searchQuery,
+      filterQuery,
+      pageNumber = 1,
+      pageSize = 20,
+    } = params;
+
+    let sortOptions: Prisma.CourseOrderByWithRelationInput;
+
+    switch (filterQuery) {
+      case 'most-popular':
+        sortOptions = { purchases: { _count: 'desc' } };
+        break;
+
+      case 'newest':
+        sortOptions = {
+          createdAt: 'desc',
+        };
+        break;
+
+      case 'recommended':
+        sortOptions = {
+          createdAt: 'desc',
+        };
+        break;
+
+      case 'price-low-to-high':
+        sortOptions = {
+          price: 'asc',
+        };
+        break;
+
+      case 'price-high-to-low':
+        sortOptions = {
+          price: 'desc',
+        };
+        break;
+
+      default:
+        sortOptions = {
+          createdAt: 'asc',
+        };
+        break;
+    }
+
+    const [courses, totalCount] = await prisma.$transaction([
+      prisma.course.findMany({
+        where: {
+          isPublished: true,
+          ...(searchQuery && {
+            OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
+          }),
+        },
+        include: {
+          category: true,
+          chapters: {
+            where: {
+              isPublished: true,
+            },
+            select: {
+              id: true,
+            },
+          },
+          purchases: {
+            where: {
+              clerkId: userId,
+            },
+          },
+        },
+        orderBy: sortOptions,
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+      }),
+
+      prisma.course.count({
+        where: {
+          isPublished: true,
+          ...(searchQuery && {
+            OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
+          }),
+        },
+      }),
+    ]);
+
+    const coursesWithProgress = await Promise.all(
+      courses.map(async (course: CourseWithProgress) => {
+        if (course.purchases.length === 0) {
+          return {
+            ...course,
+            progress: null,
+          };
+        }
+
+        const progressPercentage = await getProgress({
+          courseId: course.id,
+          userId,
+        });
+
+        return {
+          ...course,
+          progress: progressPercentage,
+        };
+      })
+    );
+
+    return { coursesWithProgress, pageSize, totalCount };
+  } catch (error) {
+    handleError(error);
+    return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
+  }
+}
+
+export async function getRecommendations(
+  params: GetAllCoursesParams
+): Promise<CoursesResult> {
+  try {
+    const { userId, searchQuery, pageNumber = 1, pageSize = 20 } = params;
     // Get liked questions for the user
     const likedQuestions = await prisma.like.findMany({
       where: { clerkId: userId },
     });
 
     // Return empty if no likes found
-    if (!likedQuestions.length) return [];
+    if (!likedQuestions.length)
+      return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
 
     // Extract unique category IDs from liked questions
     const likedQuestionIds = likedQuestions.map((q) => q.questionId);
@@ -445,41 +471,68 @@ export async function getRecommendations(userId: string) {
     );
 
     // Fetch courses for each unique category with necessary relationships
-    const courses = await prisma.course.findMany({
-      where: {
-        categoryId: { in: uniqueCategoryIds },
-        isPublished: true,
-      },
-      include: {
-        category: true,
-        chapters: {
-          where: { isPublished: true },
-          select: { id: true },
+    const [courses, totalCount] = await prisma.$transaction([
+      prisma.course.findMany({
+        where: {
+          categoryId: { in: uniqueCategoryIds },
+          isPublished: true,
+          ...(searchQuery && {
+            OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
+          }),
         },
-        purchases: {
-          where: { clerkId: userId },
+        include: {
+          category: true,
+          chapters: {
+            where: { isPublished: true },
+            select: { id: true },
+          },
+          purchases: {
+            where: { clerkId: userId },
+          },
         },
-      },
-      orderBy: {
-        createdAt: 'desc', // Ordering courses by newest created
-      },
-    });
+        orderBy: {
+          createdAt: 'desc', // Ordering courses by newest created
+        },
+        skip: (pageNumber - 1) * pageSize,
+        take: pageSize,
+      }),
+
+      prisma.course.count({
+        where: {
+          categoryId: { in: uniqueCategoryIds },
+          isPublished: true,
+          ...(searchQuery && {
+            OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
+          }),
+        },
+      }),
+    ]);
 
     // For each course, determine user progress or null if not purchased
     const coursesWithProgress = await Promise.all(
-      courses.map(async (course) => {
-        const progressPercentage =
-          course.purchases.length > 0
-            ? await getProgress({ courseId: course.id, userId })
-            : null;
+      courses.map(async (course: CourseWithProgress) => {
+        if (course.purchases.length === 0) {
+          return {
+            ...course,
+            progress: null,
+          };
+        }
 
-        return { ...course, progress: progressPercentage };
+        const progressPercentage = await getProgress({
+          courseId: course.id,
+          userId,
+        });
+
+        return {
+          ...course,
+          progress: progressPercentage,
+        };
       })
     );
 
-    return coursesWithProgress;
+    return { coursesWithProgress, pageSize, totalCount };
   } catch (error) {
     handleError(error);
-    return [];
+    return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
   }
 }

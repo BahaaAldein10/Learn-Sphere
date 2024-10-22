@@ -1,5 +1,6 @@
 import CourseCard from '@/components/shared/CourseCard';
 import CourseFilters from '@/components/shared/CourseFilters';
+import Pagination from '@/components/shared/Pagination';
 import {
   getAllCourses,
   getRecommendations,
@@ -13,15 +14,20 @@ const Courses = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   if (!userId) return redirect('/');
 
-  let courses;
+  let result;
 
   if (searchParams.filter === 'recommended') {
-    courses = await getRecommendations(userId);
+    result = await getRecommendations({
+      userId,
+      searchQuery: searchParams.q,
+      pageNumber: searchParams.page ? +searchParams.page : 1,
+    });
   } else {
-    courses = await getAllCourses({
+    result = await getAllCourses({
       userId,
       searchQuery: searchParams.q,
       filterQuery: searchParams.filter,
+      pageNumber: searchParams.page ? +searchParams.page : 1,
     });
   }
 
@@ -30,9 +36,9 @@ const Courses = async ({ searchParams }: SearchParamsProps) => {
       <CourseFilters />
 
       <div className="p-6">
-        {courses.length > 0 ? (
+        {result.coursesWithProgress.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-            {courses.map((course, index) => (
+            {result.coursesWithProgress.map((course, index) => (
               <CourseCard
                 key={index}
                 id={course?.id as string}
@@ -63,6 +69,16 @@ const Courses = async ({ searchParams }: SearchParamsProps) => {
             </p>
           </div>
         )}
+
+        <div className="mt-10">
+          {result.totalCount > result.pageSize && (
+            <Pagination
+              currentPage={searchParams.page ? +searchParams.page : 1}
+              totalItems={result.totalCount}
+              itemsPerPage={result.pageSize}
+            />
+          )}
+        </div>
       </div>
     </>
   );
