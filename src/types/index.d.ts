@@ -33,6 +33,8 @@ export interface GetAllCoursesParams {
   userId: string;
   searchQuery?: string;
   filterQuery?: string;
+  pageNumber?: number;
+  pageSize?: number;
 }
 
 export interface FindLastCourseParams {

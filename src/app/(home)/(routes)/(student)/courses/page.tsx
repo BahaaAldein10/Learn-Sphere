@@ -1,6 +1,9 @@
 import CourseCard from '@/components/shared/CourseCard';
 import CourseFilters from '@/components/shared/CourseFilters';
-import { getAllCourses } from '@/lib/actions/course.actions';
+import {
+  getAllCourses,
+  getRecommendations,
+} from '@/lib/actions/course.actions';
 import { SearchParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import Image from 'next/image';
@@ -10,29 +13,36 @@ const Courses = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   if (!userId) return redirect('/');
 
-  const courses = await getAllCourses({
-    userId,
-    searchQuery: searchParams.q,
-    filterQuery: searchParams.filter,
-  });
+  let courses;
+
+  if (searchParams.filter === 'recommended') {
+    courses = await getRecommendations(userId);
+  } else {
+    courses = await getAllCourses({
+      userId,
+      searchQuery: searchParams.q,
+      filterQuery: searchParams.filter,
+      pageNumber: searchParams.page ? +searchParams.page : 1,
+    });
+  }
 
   return (
     <>
       <CourseFilters />
 
       <div className="p-6">
-        {courses && courses.length > 0 ? (
+        {courses.length > 0 ? (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
             {courses.map((course, index) => (
               <CourseCard
                 key={index}
-                id={course.id}
-                name={course.name}
-                imageUrl={course.imageUrl!}
-                category={course.category?.name as string}
-                chapters={course.chapters?.length as number}
-                price={course.price!}
-                progress={course.progress}
+                id={course?.id as string}
+                name={course?.name as string}
+                imageUrl={course?.imageUrl as string}
+                category={course?.category?.name as string}
+                chapters={course?.chapters?.length as number}
+                price={course?.price as number}
+                progress={course?.progress}
               />
             ))}
           </div>

@@ -171,6 +171,7 @@ model Like {
   questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
+  @@index([clerkId])
   @@unique([questionId, clerkId])
 }
 
@@ -192,6 +193,7 @@ model Interaction {
   question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
-
+  
+  @@index([clerkId])
   @@unique([questionId, clerkId])
 }

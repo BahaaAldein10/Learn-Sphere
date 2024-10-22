@@ -7,8 +7,11 @@ import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 
 const CourseFilters = () => {
-  const [selectedFilter, setSelectedFilter] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const filter = searchParams.get('filter');
+  const [selectedFilter, setSelectedFilter] = useState<string | null>(
+    filter || null
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +44,7 @@ const CourseFilters = () => {
             )}
           >
             <Icon className="size-4" />
-            <span className='max-[525px]:hidden'>{label}</span>
+            <span className="max-[525px]:hidden">{label}</span>
           </Button>
         ))}
       </div>
