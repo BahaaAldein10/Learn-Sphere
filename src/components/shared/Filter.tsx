@@ -1,6 +1,6 @@
 'use client';
 
-import { formUrlQuery } from '@/lib/utils';
+import { formUrlQueryMulti } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Select,
@@ -24,10 +24,12 @@ const Filter = ({ filters, classes }: FilterProps) => {
   const router = useRouter();
 
   const handleFilterChange = (value: string) => {
-    const newUrl = formUrlQuery({
+    const newUrl = formUrlQueryMulti({
       params: searchParams.toString(),
-      key: 'filter',
-      value,
+      queries: [
+        { key: 'filter', value },
+        { key: 'page', value: null },
+      ],
     });
 
     router.push(newUrl, { scroll: false });

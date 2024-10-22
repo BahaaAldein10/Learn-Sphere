@@ -27,12 +27,14 @@ const SearchInput = ({ placeholder, classes }: SearchInputProps) => {
             { key: 'page', value: null },
           ],
         });
+
         router.push(newUrl, { scroll: false });
       } else {
         const newUrl = removeKeysFromQuery({
           params: searchParams.toString(),
           keysToRemove: ['q'],
         });
+
         router.push(newUrl, { scroll: false });
       }
     }, 500);

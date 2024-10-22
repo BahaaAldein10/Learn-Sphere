@@ -1,7 +1,7 @@
 'use client';
 
 import { COURSE_SORT_OPTIONS } from '@/constants';
-import { cn, formUrlQuery } from '@/lib/utils';
+import { cn, formUrlQueryMulti } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
@@ -15,10 +15,12 @@ const CourseFilters = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const newUrl = formUrlQuery({
+    const newUrl = formUrlQueryMulti({
       params: searchParams.toString(),
-      key: 'filter',
-      value: selectedFilter,
+      queries: [
+        { key: 'filter', value: selectedFilter },
+        { key: 'page', value: null },
+      ],
     });
 
     router.push(newUrl, { scroll: false });
