@@ -22,7 +22,10 @@ const Courses = async ({ searchParams }: SearchParamsProps) => {
       userId,
       searchQuery: searchParams.q,
       filterQuery: searchParams.filter,
+<<<<<<< HEAD
       pageNumber: searchParams.page ? +searchParams.page : 1,
+=======
+>>>>>>> 42217ad81ba0a6b2e21581279c86dd2b1d292136
     });
   }
 

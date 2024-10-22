@@ -117,6 +117,105 @@ export async function getCourse(params: GetCourseParams) {
   }
 }
 
+<<<<<<< HEAD
+=======
+export async function getAllCourses(params: GetAllCoursesParams) {
+  try {
+    const { userId, searchQuery, filterQuery } = params;
+
+    let sortOptions: Prisma.CourseOrderByWithRelationInput;
+
+    switch (filterQuery) {
+      case 'most-popular':
+        sortOptions = { purchases: { _count: 'desc' } };
+        break;
+
+      case 'newest':
+        sortOptions = {
+          createdAt: 'desc',
+        };
+        break;
+
+      case 'recommended':
+        sortOptions = {
+          createdAt: 'desc',
+        };
+        break;
+
+      case 'price-low-to-high':
+        sortOptions = {
+          price: 'asc',
+        };
+        break;
+
+      case 'price-high-to-low':
+        sortOptions = {
+          price: 'desc',
+        };
+        break;
+
+      default:
+        sortOptions = {
+          createdAt: 'asc',
+        };
+        break;
+    }
+
+    const courses = await prisma.course.findMany({
+      where: {
+        isPublished: true,
+        ...(searchQuery && {
+          OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
+        }),
+      },
+      include: {
+        category: true,
+        chapters: {
+          where: {
+            isPublished: true,
+          },
+          select: {
+            id: true,
+          },
+        },
+        purchases: {
+          where: {
+            clerkId: userId,
+          },
+        },
+      },
+      orderBy: sortOptions,
+    });
+
+    const coursesWithProgress = await Promise.all(
+      courses.map(async (course: CourseWithProgress) => {
+        if (course.purchases.length === 0) {
+          return {
+            ...course,
+            progress: null,
+          };
+        }
+
+        const progressPercentage = await getProgress({
+          courseId: course.id,
+          userId,
+        });
+
+        return {
+          ...course,
+          progress: progressPercentage,
+        };
+      })
+    );
+
+    return coursesWithProgress;
+  } catch (error) {
+    console.error('Error fetching courses:', error);
+    return [];
+  }
+}
+
+>>>>>>> 42217ad81ba0a6b2e21581279c86dd2b1d292136
 export async function updateCourse(params: UpdateCourseParams) {
   try {
     const { id, values, userId } = params;
@@ -328,6 +427,7 @@ export async function getAnalytics(userId: string) {
   }
 }
 
+<<<<<<< HEAD
 export async function getAllCourses(params: GetAllCoursesParams) {
   try {
     const {
@@ -432,6 +532,8 @@ export async function getAllCourses(params: GetAllCoursesParams) {
   }
 }
 
+=======
+>>>>>>> 42217ad81ba0a6b2e21581279c86dd2b1d292136
 export async function getRecommendations(userId: string) {
   try {
     // Get liked questions for the user
@@ -475,6 +577,7 @@ export async function getRecommendations(userId: string) {
 
     // For each course, determine user progress or null if not purchased
     const coursesWithProgress = await Promise.all(
+<<<<<<< HEAD
       courses.map(async (course: CourseWithProgress) => {
         if (course.purchases.length === 0) {
           return {
@@ -492,6 +595,15 @@ export async function getRecommendations(userId: string) {
           ...course,
           progress: progressPercentage,
         };
+=======
+      courses.map(async (course) => {
+        const progressPercentage =
+          course.purchases.length > 0
+            ? await getProgress({ courseId: course.id, userId })
+            : null;
+
+        return { ...course, progress: progressPercentage };
+>>>>>>> 42217ad81ba0a6b2e21581279c86dd2b1d292136
       })
     );
 
