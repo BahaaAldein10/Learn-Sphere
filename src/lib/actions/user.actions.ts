@@ -1,3 +1,4 @@
+'use server';
 /* eslint-disable camelcase */
 import prisma from '../db';
 import { handleError } from '../utils';
@@ -79,6 +80,25 @@ export async function getUser(params: GetUserParams) {
     });
 
     return user;
+  } catch (error) {
+    handleError(error);
+  }
+}
+
+export async function isTeacher(params: GetUserParams) {
+  try {
+    const { userId } = params;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    return user?.role === 'TEACHER';
   } catch (error) {
     handleError(error);
   }

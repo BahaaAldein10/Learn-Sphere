@@ -28,7 +28,7 @@ const CourseFilters = () => {
 
   return (
     <div className="p-6 pb-0">
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4 max-sm:gap-3">
         {COURSE_SORT_OPTIONS.map(({ value, Icon, label }, index) => (
           <Button
             key={index}

@@ -3,7 +3,16 @@ import { InfoCard } from '@/components/shared/InfoCard';
 import { getDashboardCourses } from '@/lib/actions/course.actions';
 import { auth } from '@clerk/nextjs/server';
 import { CheckCircle, Clock } from 'lucide-react';
+import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Dashboard | LearnSphere',
+  description:
+    'Access your personalized dashboard on LearnSphere to track your courses, progress, and achievements.',
+  keywords:
+    'dashboard, learning progress, student dashboard, courses tracking, achievements',
+};
 
 export default async function Dashboard() {
   const { userId } = auth();

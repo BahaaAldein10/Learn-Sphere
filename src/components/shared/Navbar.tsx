@@ -1,15 +1,32 @@
 'use client';
 
-import { UserButton } from '@clerk/nextjs';
+import { getUser } from '@/lib/actions/user.actions';
+import { useAuth, UserButton } from '@clerk/nextjs';
+import { Role } from '@prisma/client';
 import { LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { redirect, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { MobileSidebar } from './MobileSidebar';
 import SearchInput from './SearchInput';
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { userId } = useAuth();
+  const [userRole, setUserRole] = useState<Role>();
+
+  useEffect(() => {
+    if (!userId) return redirect('/');
+
+    const fetchUserRole = async () => {
+      const user = await getUser({ userId });
+      setUserRole(user?.role);
+    };
+
+    fetchUserRole();
+  }, [userId]);
+
   const teacherMode =
     pathname.includes('/teacher') ||
     (pathname.includes('/courses') && pathname.includes('/chapters'));
@@ -32,19 +49,23 @@ const Navbar = () => {
           <div />
         )}
 
-        <div className="flex-center gap-2">
-          <Link href={teacherMode ? '/courses' : '/teacher/courses/'}>
-            <Button
-              variant="ghost"
-              className="flex gap-2 text-base font-semibold"
-            >
-              {teacherMode && <LogOut />}
-              {teacherMode ? 'Exit' : 'Teacher Mode'}
-            </Button>
-          </Link>
+        {userRole === 'TEACHER' ? (
+          <div className="flex-center gap-2">
+            <Link href={teacherMode ? '/courses' : '/teacher/courses/'}>
+              <Button
+                variant="ghost"
+                className="flex gap-2 text-base font-semibold"
+              >
+                {teacherMode && <LogOut />}
+                {teacherMode ? 'Exit' : 'Teacher Mode'}
+              </Button>
+            </Link>
 
+            <UserButton />
+          </div>
+        ) : (
           <UserButton />
-        </div>
+        )}
       </div>
     </nav>
   );

@@ -6,8 +6,17 @@ import { Button } from '@/components/ui/button';
 import { QuestionFilters } from '@/constants';
 import { getAllQuestions } from '@/lib/actions/question.actions';
 import { SearchParamsProps } from '@/types';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Forum | LearnSphere',
+  description:
+    'Join the LearnSphere forum to ask questions, find answers, and discuss educational topics with the community.',
+  keywords:
+    'forum, questions and answers, education discussions, learning community, knowledge sharing',
+};
 
 const Forum = async ({ searchParams }: SearchParamsProps) => {
   const result = await getAllQuestions({

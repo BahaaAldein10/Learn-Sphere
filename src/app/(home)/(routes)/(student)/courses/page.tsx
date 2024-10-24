@@ -7,8 +7,15 @@ import {
 } from '@/lib/actions/course.actions';
 import { SearchParamsProps } from '@/types';
 import { auth } from '@clerk/nextjs/server';
+import { Metadata } from 'next';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
+
+export const metadata: Metadata = {
+  title: 'Browse | LearnSphere',
+  description: 'Browse a variety of educational courses at LearnSphere.',
+  keywords: 'courses, education, learning, online courses',
+};
 
 const Courses = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
