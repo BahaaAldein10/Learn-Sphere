@@ -35,7 +35,7 @@ type Course = {
 interface CategoryFormProps {
   initialData: Course;
   courseId: string;
-  options: {
+  categories: {
     label: string;
     value: string;
   }[];
@@ -48,7 +48,7 @@ const formSchema = z.object({
 export const CategoryForm = ({
   initialData,
   courseId,
-  options,
+  categories,
 }: CategoryFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
@@ -75,13 +75,14 @@ export const CategoryForm = ({
       toggleEdit();
       toast.success('Course updated');
       router.refresh();
+      form.reset();
     } catch {
       toast.error('Something went wrong');
     }
   };
 
-  const selectedOption = options.find(
-    (option) => option.value === initialData.categoryId
+  const selectedCategory = categories.find(
+    (category) => category.value === initialData.categoryId
   );
 
   return (
@@ -111,7 +112,7 @@ export const CategoryForm = ({
             !initialData.categoryId && 'text-slate-500 italic'
           )}
         >
-          {selectedOption?.label || 'No category'}
+          {selectedCategory?.label || 'No category'}
         </p>
       )}
 
@@ -128,7 +129,7 @@ export const CategoryForm = ({
                 <FormItem>
                   <FormControl>
                     <Combobox
-                      options={options}
+                      categories={categories}
                       disabled={isSubmitting}
                       {...field}
                     />

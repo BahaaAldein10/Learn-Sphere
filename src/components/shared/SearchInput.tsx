@@ -47,7 +47,7 @@ const SearchInput = ({ placeholder, classes }: SearchInputProps) => {
       <Search />
       <Input
         placeholder={placeholder}
-        className="no-focus bg-gray-100"
+        className="no-focus select-none bg-gray-100"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />

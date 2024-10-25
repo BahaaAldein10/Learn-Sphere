@@ -39,7 +39,7 @@ const CourseFilters = () => {
               } else setSelectedFilter(value);
             }}
             className={cn(
-              'flex items-center gap-2 px-4 py-2 text-sm transition-all',
+              'flex items-center select-none gap-2 px-4 py-2 text-sm transition-all',
               selectedFilter === value
                 ? 'bg-purple-100 text-purple-700 hover:text-purple-700'
                 : 'hover:bg-purple-50 hover:text-purple-600'

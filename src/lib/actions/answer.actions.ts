@@ -40,3 +40,17 @@ export async function getAllAnswers(questionId: string) {
     handleError(error);
   }
 }
+
+export async function getUserByAnswer({ userId }: { userId: string }) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    handleError(error);
+  }
+}

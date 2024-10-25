@@ -19,14 +19,15 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import * as React from 'react';
 
 interface ComboboxProps {
-  options: {
+  categories: {
     value: string;
     label: string;
   }[];
   value: string;
   onChange: (value: string) => void;
 }
-export function Combobox({ options, value, onChange }: ComboboxProps) {
+
+export function Combobox({ categories, value, onChange }: ComboboxProps) {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -39,33 +40,33 @@ export function Combobox({ options, value, onChange }: ComboboxProps) {
           className="w-full justify-between"
         >
           {value
-            ? options.find((option) => option.value === value)?.label
-            : 'Select option...'}
+            ? categories.find((category) => category.value === value)?.label
+            : 'Select category'}
           <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search option..." />
+          <CommandInput placeholder="Search category..." />
           <CommandList>
-            <CommandEmpty>No option found.</CommandEmpty>
+            <CommandEmpty>No category found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => (
+              {categories.map((category) => (
                 <CommandItem
-                  key={option.value}
-                  value={option.value}
+                  key={category.value}
+                  value={category.label}
                   onSelect={() => {
-                    onChange(option.value === value ? '' : option.value);
+                    onChange(category.value);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      value === option.value ? 'opacity-100' : 'opacity-0'
+                      value === category.value ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  {option.label}
+                  {category.label}
                 </CommandItem>
               ))}
             </CommandGroup>

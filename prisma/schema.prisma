@@ -113,8 +113,10 @@ model StripeCustomer {
 }
 
 model Question {
-  id          String @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId     String
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId String
+  user    User   @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+
   title       String
   description String
 
@@ -137,6 +139,7 @@ model Question {
 model Answer {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   clerkId    String
+  user       User     @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
   content    String
   questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
@@ -144,7 +147,7 @@ model Answer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([questionId])
+  @@index([questionId, clerkId])
 }
 
 enum Role {
@@ -163,6 +166,9 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  question Question[]
+  answer   Answer[]
 }
 
 model Like {
@@ -171,8 +177,8 @@ model Like {
   questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
-  @@index([clerkId])
   @@unique([questionId, clerkId])
+  @@index([clerkId])
 }
 
 model DisLike {
@@ -185,15 +191,12 @@ model DisLike {
 }
 
 model Interaction {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId String
-  action  String
-
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId    String
+  action     String
   questionId String?   @db.ObjectId
   question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
 
-  createdAt DateTime @default(now())
-  
-  @@index([clerkId])
-  @@unique([questionId, clerkId])
+  @@index([questionId, clerkId, action])
 }

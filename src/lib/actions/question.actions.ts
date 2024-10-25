@@ -1,6 +1,7 @@
 'use server';
 
 import { Prisma } from '@prisma/client';
+import { addHours } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 import prisma from '../db';
 import { handleError } from '../utils';
@@ -374,28 +375,39 @@ export async function viewQuestion(params: ViewQuestionParams) {
       throw new Error('questionId and userId are required.');
     }
 
-    await prisma.question.update({
-      where: {
-        id: questionId,
-      },
-      data: {
-        views: { increment: 1 },
-      },
-    });
+    // Define the view expiration time in hours
+    const viewExpiryHours = 1; // Change this as needed
 
-    const existingInteraction = await prisma.interaction.findUnique({
+    // Check for an existing interaction with "view" action
+    const existingInteraction = await prisma.interaction.findFirst({
       where: {
-        questionId_clerkId: {
-          questionId,
-          clerkId: userId,
-        },
+        questionId,
+        clerkId: userId,
         action: 'view',
       },
+      orderBy: {
+        createdAt: 'desc', // Get the latest view interaction
+      },
     });
 
-    if (existingInteraction) {
-      return;
-    } else {
+    const now = new Date();
+    const expirationTime = existingInteraction
+      ? addHours(new Date(existingInteraction.createdAt), viewExpiryHours)
+      : new Date(0); // If no interaction, set to a past date to allow view count
+
+    // Only increment if there's no recent view within the expiration period
+    if (!existingInteraction || now > expirationTime) {
+      // Increment views
+      await prisma.question.update({
+        where: {
+          id: questionId,
+        },
+        data: {
+          views: { increment: 1 },
+        },
+      });
+
+      // Record the new view interaction
       await prisma.interaction.create({
         data: {
           questionId,
@@ -403,9 +415,10 @@ export async function viewQuestion(params: ViewQuestionParams) {
           action: 'view',
         },
       });
-    }
 
-    revalidatePath(`/forum/${questionId}`);
+      // Revalidate the page path
+      revalidatePath(`/forum/${questionId}`);
+    }
   } catch (error) {
     handleError(error);
   }

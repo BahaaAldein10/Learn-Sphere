@@ -20,7 +20,7 @@ const Sidebar = () => {
         <Link href="/">
           <div className="flex items-center gap-2">
             <GraduationCap size={40} />
-            <h6 className="text-xl font-semibold">LearnSphere</h6>
+            <h6 className="select-none text-xl font-semibold">LearnSphere</h6>
           </div>
         </Link>
       </div>
@@ -34,7 +34,7 @@ const Sidebar = () => {
               key={label}
               href={route}
               className={cn(
-                'flex items-center text-slate-500 text-sm pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20',
+                'flex items-center select-none text-slate-500 text-sm pl-6 transition-all hover:text-slate-600 hover:bg-slate-300/20',
                 active &&
                   'text-purple-900 bg-purple-200/20 hover:bg-purple-200/20 hover:text-purple-900'
               )}

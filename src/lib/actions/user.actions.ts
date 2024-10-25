@@ -64,6 +64,18 @@ export async function deleteUser(id: string | undefined) {
         clerkId: id,
       },
     });
+
+    await prisma.question.deleteMany({
+      where: {
+        clerkId: id,
+      },
+    });
+
+    await prisma.answer.deleteMany({
+      where: {
+        clerkId: id,
+      },
+    });
   } catch (error) {
     handleError(error);
   }

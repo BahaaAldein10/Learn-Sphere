@@ -30,6 +30,8 @@ const Navbar = () => {
   const teacherMode =
     pathname.includes('/teacher') ||
     (pathname.includes('/courses') && pathname.includes('/chapters'));
+  const studentMode =
+    pathname.includes('/courses') && pathname.includes('/chapters');
   const isNotRootPath = pathname !== '/';
   const isCourseOrChapter =
     pathname.includes('/courses') &&
@@ -64,7 +66,22 @@ const Navbar = () => {
             <UserButton />
           </div>
         ) : (
-          <UserButton />
+          <div className="flex-center gap-2">
+            <Link
+              href="/courses"
+              className={`${studentMode ? 'block' : 'hidden'}`}
+            >
+              <Button
+                variant="ghost"
+                className="flex-center gap-2 text-base font-semibold"
+              >
+                {studentMode && <LogOut />}
+                {studentMode && <span>Exit</span>}
+              </Button>
+            </Link>
+
+            <UserButton />
+          </div>
         )}
       </div>
     </nav>

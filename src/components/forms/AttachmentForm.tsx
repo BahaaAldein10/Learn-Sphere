@@ -28,9 +28,6 @@ const formSchema = z.object({
     .string()
     .min(1, { message: 'URL is required.' })
     .url({ message: 'Invalid URL format.' }),
-  // originalFilename: z
-  //   .string()
-  //   .min(1, { message: 'Original filename is required.' }),
 });
 
 type Course = {

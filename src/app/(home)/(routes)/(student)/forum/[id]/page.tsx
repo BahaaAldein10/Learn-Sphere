@@ -104,7 +104,7 @@ const QuestionPage = async ({ params }: ParamsProps) => {
         />
       </div>
 
-      <AllAnswers user={user!} questionId={id} />
+      <AllAnswers questionId={id} />
 
       <AnswerForm questionId={id} />
     </section>
