@@ -94,6 +94,7 @@ const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
               fill
               className="rounded-md object-cover"
               src={initialData.imageUrl}
+              loading="lazy"
             />
           </div>
         ))}

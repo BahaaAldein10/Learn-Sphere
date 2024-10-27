@@ -68,6 +68,7 @@ const Forum = async ({ searchParams }: SearchParamsProps) => {
               width={350}
               height={350}
               className="mb-6"
+              loading="lazy"
             />
             <h2 className="mb-2 text-2xl font-semibold">
               No Questions Available

@@ -18,6 +18,7 @@ const AnswerCard = async ({ answer }: { answer: Answer }) => {
             width={28}
             height={28}
             className="select-none rounded-full"
+            loading="lazy"
           />
           <div className="text-sm">
             <span className="font-medium text-gray-800">{user?.username}</span>

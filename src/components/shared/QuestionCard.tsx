@@ -58,6 +58,7 @@ const QuestionCard = async ({
             width={32}
             height={32}
             className="select-none rounded-full border border-gray-300"
+            loading="lazy"
           />
           <div className="text-sm">
             <span className="font-medium text-gray-800">{user?.username}</span>
