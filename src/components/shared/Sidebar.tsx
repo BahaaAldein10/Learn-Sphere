@@ -2,7 +2,7 @@
 
 import { StudentSidebarLinks, TeacherSidebarLinks } from '@/constants';
 import { cn } from '@/lib/utils';
-import { GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -19,7 +19,7 @@ const Sidebar = () => {
       <div className="p-6 pb-4">
         <Link href="/">
           <div className="flex items-center gap-2">
-            <GraduationCap size={40} />
+            <Image src={'/assets/logo.png'} alt="logo" width={40} height={40} />
             <h6 className="select-none text-xl font-semibold">LearnSphere</h6>
           </div>
         </Link>

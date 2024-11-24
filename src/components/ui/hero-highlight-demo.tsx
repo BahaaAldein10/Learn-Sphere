@@ -48,7 +48,7 @@ export function HeroHighlightDemo() {
             transition={{ duration: 0.3, delay: 0.5 }}
             className="rounded-lg bg-purple-700 px-6 py-3 font-semibold text-white shadow-lg transition-transform"
           >
-            Get Started
+            Start Learning
           </motion.button>
         </Link>
       </div>
