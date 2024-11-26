@@ -1,3 +1,4 @@
+import Chatbot from '@/components/shared/Chatbot';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const AIChatbot = () => {
-  return <div>COMING SOON...</div>;
+  return <Chatbot />;
 };
 
 export default AIChatbot;

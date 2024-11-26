@@ -84,14 +84,14 @@ const ChaptersList = ({ items, onReorder, onEdit }: ChaptersListProps) => {
                     {...provided.draggableProps}
                     className={cn(
                       `flex items-center gap-x-2 bg-gray-200 border-gray-200 border text-gray-700 rounded-md mb-4 text-sm
-                       ${chapter.isPublished && 'bg-blue-100 border-blue-200 text-blue-700'}`
+                       ${chapter.isPublished && 'bg-purple-200 border-purple-200 text-purple-700'}`
                     )}
                   >
                     <div
                       {...provided.dragHandleProps}
                       className={cn(`
                         cursor-grab px-2 py-3 border-r border-r-gray-200 hover:bg-gray-300 rounded-l-md transition
-                         ${chapter.isPublished && 'border-r-blue-200 hover:bg-blue-200'}`)}
+                         ${chapter.isPublished && 'border-r-purple-200 hover:bg-purple-300'}`)}
                     >
                       <Grip className="size-5" />
                     </div>
