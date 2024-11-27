@@ -7,14 +7,15 @@ import {
   FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form';
 import { createAnswer } from '@/lib/actions/answer.actions';
 import { useAuth } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
@@ -27,9 +28,17 @@ const formSchema = z.object({
     .max(3000, 'Answer cannot exceed 3000 characters.'),
 });
 
-const AnswerForm = ({ questionId }: { questionId: string }) => {
-  const { userId } = useAuth();
+const AnswerForm = ({
+  questionId,
+  questionTitle,
+}: {
+  questionId: string;
+  questionTitle: string;
+}) => {
+  const [answer, setAnswer] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { userId } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,6 +69,28 @@ const AnswerForm = ({ questionId }: { questionId: string }) => {
     }
   }
 
+  const handleGenerateAnswer = async () => {
+    try {
+      setLoading(true);
+      setAnswer('');
+
+      const res = await fetch('/api/answer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application.json' },
+        body: JSON.stringify({ question: questionTitle }),
+      });
+
+      if (!res.ok) return toast.error('An unexpected error occurred.');
+
+      const data = await res.json();
+      setAnswer(data.response);
+    } catch {
+      toast.error('Failed to connect to the server. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section className="mt-10">
       <Form {...form}>
@@ -69,10 +100,28 @@ const AnswerForm = ({ questionId }: { questionId: string }) => {
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Write your answer here</FormLabel>
+                <div className="flex-between mb-4">
+                  <h1>Write your answer here</h1>
+                  <Button
+                    className="gap-1"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleGenerateAnswer();
+                    }}
+                    disabled={loading}
+                  >
+                    <Image
+                      src="/assets/ai.png"
+                      alt="ai"
+                      width={24}
+                      height={24}
+                    />
+                    <span>{loading ? 'Generating...' : 'Generate Answer'}</span>
+                  </Button>
+                </div>
                 <FormControl>
                   <Editor
-                    value={field.value}
+                    value={answer}
                     onChange={field.onChange}
                     placeholder="Share your knowledge and insights about the question"
                   />
