@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import HomeNavbar from '../shared/HomeNavbar';
+import ButtonAnimatedGradient from './ButtonAnimatedGradient';
 import { HeroHighlight, Highlight } from './hero-highlight';
 
 export function HeroHighlightDemo() {
@@ -42,14 +43,13 @@ export function HeroHighlightDemo() {
       {/* CTA Button */}
       <div className="mt-10 flex justify-center gap-4">
         <Link href="/courses">
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.5 }}
-            className="rounded-lg bg-purple-700 px-6 py-3 font-semibold text-white shadow-lg transition-transform"
           >
-            Start Learning
-          </motion.button>
+            <ButtonAnimatedGradient />
+          </motion.div>
         </Link>
       </div>
     </HeroHighlight>

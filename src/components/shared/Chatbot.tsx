@@ -142,7 +142,7 @@ const Chatbot = () => {
                 )}
               </Button>
               <Button
-                className="mt-4 w-full bg-purple-200 text-purple-700 hover:bg-purple-200/80"
+                className="mt-4 w-full bg-purple-100 text-purple-700 hover:bg-purple-100/80"
                 onClick={(e) => {
                   e.preventDefault();
                   setConversationHistory([]);
