@@ -1,16 +1,16 @@
 'use client';
 
-import { createChapter, updateChapter } from '@/lib/actions/chapter.actions';
+import { createQuiz } from '@/lib/actions/quiz.actions';
 import { cn } from '@/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Chapter, Course } from '@prisma/client';
-import { Loader2, PlusCircle } from 'lucide-react';
+import { Course, Quiz } from '@prisma/client';
+import { Pencil, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import ChaptersList from '../shared/ChaptersList';
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 import {
   Form,
@@ -21,11 +21,6 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 
-interface ChaptersFormProps {
-  initialData: Course & { chapters: Chapter[] };
-  courseId: string;
-}
-
 const formSchema = z.object({
   title: z
     .string()
@@ -33,14 +28,14 @@ const formSchema = z.object({
     .max(50, { message: 'Title must be 50 characters or less' }),
 });
 
-const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
-  const [isCreating, setIsCreating] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const router = useRouter();
+interface QuizFormProps {
+  initialData: Course & { quiz: Quiz | null };
+  courseId: string;
+}
 
-  const toggleCreate = () => {
-    setIsCreating(!isCreating);
-  };
+const QuizForm = ({ initialData, courseId }: QuizFormProps) => {
+  const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,38 +44,18 @@ const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
     },
   });
 
-  const onReorder = async (updateData: { id: string; position: number }[]) => {
-    try {
-      setIsUpdating(true);
-
-      await updateChapter({
-        list: updateData,
-      });
-
-      toast.success('Chapters reordered');
-      router.refresh();
-    } catch {
-      toast.error('Something went wrong');
-    } finally {
-      setIsUpdating(false);
-    }
-  };
-
-  const onEdit = async (id: string) => {
-    router.push(`/teacher/courses/${courseId}/chapters/${id}`);
-  };
-
   const { isValid, isSubmitting } = form.formState;
+
+  const toggleCreate = () => {
+    setIsCreating(!isCreating);
+  };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      await createChapter({
-        title: values.title,
-        courseId,
-      });
+      await createQuiz({ courseId, title: values.title });
 
       toggleCreate();
-      toast.success('Chapter created');
+      toast.success('Quiz created');
       router.refresh();
     } catch (error) {
       console.log(error);
@@ -90,28 +65,24 @@ const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
 
   return (
     <div className="relative mt-6 rounded-lg bg-gray-50 p-6 shadow-md">
-      {isUpdating && (
-        <div className="absolute right-0 top-0 flex size-full items-center justify-center rounded-md bg-slate-500/20">
-          <Loader2 className="size-6 animate-spin text-purple-700" />
-        </div>
-      )}
-
       <div className="flex items-center justify-between text-lg font-semibold text-gray-700">
-        Course Chapters
-        <Button
-          onClick={toggleCreate}
-          variant="ghost"
-          className="flex items-center gap-2 hover:text-purple-600"
-        >
-          {isCreating ? (
-            <>Cancel</>
-          ) : (
-            <>
-              <PlusCircle className="size-4" />
-              Add a chapter
-            </>
-          )}
-        </Button>
+        Course Quizzes
+        {!initialData.quiz && (
+          <Button
+            onClick={toggleCreate}
+            variant="ghost"
+            className="flex items-center gap-2 hover:text-purple-600"
+          >
+            {isCreating ? (
+              <>Cancel</>
+            ) : (
+              <>
+                <PlusCircle className="size-4" />
+                Add a quiz
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       {isCreating && (
@@ -128,7 +99,7 @@ const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
                   <FormControl>
                     <Input
                       disabled={isSubmitting}
-                      placeholder="e.g. 'Introduction to the course'"
+                      placeholder="Enter quiz title"
                       {...field}
                       className="focus-visible:ring-purple-700"
                     />
@@ -163,25 +134,51 @@ const ChaptersForm = ({ initialData, courseId }: ChaptersFormProps) => {
         <div
           className={cn(
             'text-sm mt-2',
-            !initialData.chapters.length && 'text-slate-500 italic'
+            !initialData.quiz && 'text-slate-500 italic'
           )}
         >
-          {!initialData.chapters.length && 'No chapters'}
-          <ChaptersList
-            onEdit={onEdit}
-            onReorder={onReorder}
-            items={initialData.chapters || []}
-          />
-        </div>
-      )}
+          {!initialData.quiz && 'No quizzes available.'}
 
-      {!isCreating && (
-        <p className="mt-4 text-xs text-muted-foreground">
-          Drag and drop to reorder the chapters
-        </p>
+          {initialData.quiz && (
+            <div
+              className={cn(
+                `flex-between p-2 border rounded-md text-base font-semibold 
+                ${
+                  initialData.quiz?.isPublished
+                    ? 'bg-purple-100 border-purple-100 text-purple-700'
+                    : 'bg-gray-200 border-gray-200 text-gray-700'
+                }`
+              )}
+            >
+              <span>{initialData.quiz?.title}</span>
+
+              <div className="flex items-center gap-2">
+                <Badge
+                  className={cn(
+                    'select-none',
+                    initialData.quiz?.isPublished
+                      ? 'bg-primary'
+                      : 'bg-slate-700'
+                  )}
+                >
+                  {initialData.quiz?.isPublished ? 'Published' : 'Draft'}
+                </Badge>
+
+                <Pencil
+                  onClick={async () => {
+                    router.push(
+                      `/teacher/courses/${courseId}/quiz/${initialData.quiz?.id}`
+                    );
+                  }}
+                  className={`size-4 cursor-pointer transition ${initialData.quiz?.isPublished ? 'hover:text-purple-700' : 'hover:text-gray-700'} hover:opacity-75`}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
 };
 
-export default ChaptersForm;
+export default QuizForm;

@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { createCourse, findLastCourse } from '@/lib/actions/course.actions';
-import { handleError } from '@/lib/utils';
 import { useAuth } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
@@ -58,7 +57,7 @@ const CreateCourse = () => {
       toast.success('Course created');
     } catch (error) {
       toast.error('Something went wrong');
-      handleError(error);
+      console.log(error);
     }
   }
 

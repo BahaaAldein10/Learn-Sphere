@@ -1,7 +1,6 @@
 'use client';
 
 import { deleteCourse, publishCourse } from '@/lib/actions/course.actions';
-import { handleError } from '@/lib/utils';
 import { useConfettiStore } from '@/store/confettiStore';
 import { Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -44,7 +43,7 @@ const CourseActions = ({
 
       router.refresh();
     } catch (error) {
-      handleError(error);
+      console.log(error);
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);
@@ -63,7 +62,7 @@ const CourseActions = ({
       router.push(`/teacher/courses`);
       router.refresh();
     } catch (error) {
-      handleError(error);
+      console.log(error);
       toast.error('Something went wrong');
     } finally {
       setIsLoading(false);

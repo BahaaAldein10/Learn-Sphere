@@ -5,38 +5,22 @@ import CourseActions from '@/components/forms/CourseActions';
 import DescriptionForm from '@/components/forms/DescriptionForm';
 import ImageForm from '@/components/forms/ImageForm';
 import PriceForm from '@/components/forms/PriceForm';
+import QuizForm from '@/components/forms/QuizForm';
 import TitleForm from '@/components/forms/TitleForm';
 import { Banner } from '@/components/ui/banner';
 import { getCourse } from '@/lib/actions/course.actions';
 import prisma from '@/lib/db';
 import { auth } from '@clerk/nextjs/server';
+import { Category, Chapter } from '@prisma/client';
 import {
+  BookOpen,
   CircleDollarSign,
+  Edit3,
   File,
-  LayoutDashboard,
   ListCheck,
+  Tag,
 } from 'lucide-react';
 import { redirect } from 'next/navigation';
-
-type Chapter = {
-  id: string;
-  title: string;
-  description: string | null;
-  videoUrl: string | null;
-  position: number;
-  isPublished: boolean;
-  isFree: boolean;
-  courseId: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type Category = {
-  id: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = auth();
@@ -99,49 +83,76 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
 
         <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
+            {/* Title and Description Form */}
             <div className="flex items-center gap-2">
               <div className="rounded-full bg-purple-200 p-1">
-                <LayoutDashboard color="#581c87" className="size-6" />
+                <Edit3 color="#581c87" className="size-6" />
               </div>
-              <h2 className="text-xl font-semibold">Customize your course</h2>
+              <h2 className="text-xl font-semibold">Customize your Course</h2>
             </div>
 
             <TitleForm initialData={course} courseId={course.id} />
             <DescriptionForm initialData={course} courseId={course.id} />
             <ImageForm initialData={course} courseId={course.id} />
-            <CategoryForm
-              initialData={course}
-              courseId={course.id}
-              categories={categories.map((category: Category) => ({
-                label: category.name,
-                value: category.id,
-              }))}
-            />
+
+            {/* Category Form */}
+            <div className="mt-6">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full bg-purple-200 p-1">
+                  <Tag color="#581c87" className="size-6" />
+                </div>
+                <h2 className="text-xl font-semibold">Course Category</h2>
+              </div>
+
+              <CategoryForm
+                initialData={course}
+                courseId={course.id}
+                categories={categories.map((category: Category) => ({
+                  label: category.name,
+                  value: category.id,
+                }))}
+              />
+            </div>
+
+            {/* Price Form */}
+            <div className="mt-6">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full bg-purple-200 p-1">
+                  <CircleDollarSign color="#581c87" className="size-6" />
+                </div>
+                <h2 className="text-xl font-semibold">Sell your Course</h2>
+              </div>
+
+              <PriceForm initialData={course} courseId={course.id} />
+            </div>
           </div>
 
           <div className="space-y-6">
+            {/* Chapters Form */}
             <div>
               <div className="flex items-center gap-2">
                 <div className="rounded-full bg-purple-200 p-1">
-                  <ListCheck color="#581c87" className="size-6" />
+                  <BookOpen color="#581c87" className="size-6" />
                 </div>
-                <h2 className="text-xl font-semibold">Course chapters</h2>
+                <h2 className="text-xl font-semibold">Course Chapters</h2>
               </div>
 
               <ChaptersForm initialData={course} courseId={course.id} />
             </div>
 
+            {/* Quiz Form */}
             <div>
               <div className="flex items-center gap-2">
                 <div className="rounded-full bg-purple-200 p-1">
-                  <CircleDollarSign color="#581c87" className="size-6" />
+                  <ListCheck color="#581c87" className="size-6" />
                 </div>
-                <h2 className="text-xl font-semibold">Sell your course</h2>
+                <h2 className="text-xl font-semibold">Course Quizzes</h2>
               </div>
 
-              <PriceForm initialData={course} courseId={course.id} />
+              <QuizForm initialData={course} courseId={course.id} />
             </div>
 
+            {/* Resources & Attachments Form */}
             <div>
               <div className="flex items-center gap-2">
                 <div className="rounded-full bg-purple-200 p-1">

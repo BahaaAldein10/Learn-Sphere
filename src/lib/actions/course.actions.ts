@@ -18,7 +18,6 @@ import { auth } from '@clerk/nextjs/server';
 import { Category, Chapter, Course, Prisma, Purchase } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import prisma from '../db';
-import { handleError } from '../utils';
 import { getProgress } from './chapter.actions';
 
 type CourseWithProgressWithCategory = Course & {
@@ -66,7 +65,7 @@ export async function createCourse(params: CreateCourseParams) {
 
     return course;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -85,7 +84,7 @@ export async function findLastCourse(params: FindLastCourseParams) {
 
     return course;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -109,12 +108,13 @@ export async function getCourse(params: GetCourseParams) {
             position: 'asc',
           },
         },
+        quiz: true,
       },
     });
 
     return course;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -134,7 +134,7 @@ export async function updateCourse(params: UpdateCourseParams) {
 
     return updatedCourse;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -152,7 +152,7 @@ export async function createAttachment(params: CreateAttachmentParams) {
 
     return attachment;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -181,7 +181,7 @@ export async function deleteAttachment(params: DeleteAttachmentParams) {
 
     return attachment;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -200,7 +200,7 @@ export async function publishCourse(params: PublishCourseParams) {
 
     return publishedCourse;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -216,7 +216,7 @@ export async function deleteCourse(params: DeleteCourseParams) {
 
     return course;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -441,7 +441,7 @@ export async function getAllCourses(
 
     return { coursesWithProgress, pageSize, totalCount };
   } catch (error) {
-    handleError(error);
+    console.log(error);
     return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
   }
 }
@@ -532,7 +532,7 @@ export async function getRecommendations(
 
     return { coursesWithProgress, pageSize, totalCount };
   } catch (error) {
-    handleError(error);
+    console.log(error);
     return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
   }
 }

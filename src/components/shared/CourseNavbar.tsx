@@ -9,12 +9,27 @@ interface CourseNavbarProps {
     })[];
   };
   progressCount: number;
+  quizId: string | undefined;
+  quizTitle: string;
+  isCompleted: boolean;
 }
 
-export const CourseNavbar = ({ course, progressCount }: CourseNavbarProps) => {
+export const CourseNavbar = ({
+  course,
+  quizId,
+  quizTitle,
+  progressCount,
+  isCompleted,
+}: CourseNavbarProps) => {
   return (
     <div className="flex-between h-20 border-b bg-white shadow-sm">
-      <CourseMobileSidebar course={course} progressCount={progressCount} />
+      <CourseMobileSidebar
+        course={course}
+        progressCount={progressCount}
+        quizId={quizId}
+        quizTitle={quizTitle}
+        isCompleted={isCompleted}
+      />
       <Navbar />
     </div>
   );

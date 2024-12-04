@@ -18,7 +18,7 @@ const CourseLayout = async ({
     return redirect('/');
   }
 
-  const course = await prisma.course.findUnique({
+  const course = await prisma.course.findFirst({
     where: {
       id: params.id,
     },
@@ -41,6 +41,13 @@ const CourseLayout = async ({
     },
   });
 
+  const quiz = await prisma.quiz.findUnique({
+    where: {
+      courseId: course?.id,
+    },
+  });
+  const quizId = quiz?.id;
+
   if (!course) {
     return redirect('/');
   }
@@ -50,13 +57,27 @@ const CourseLayout = async ({
     userId,
   });
 
+  const isCompleted: boolean = progressCount === 100;
+
   return (
     <div className="h-full">
       <div className="fixed inset-y-0 z-10 h-[80px] w-full md:pl-80">
-        <CourseNavbar course={course} progressCount={progressCount} />
+        <CourseNavbar
+          course={course}
+          progressCount={progressCount}
+          quizId={quizId}
+          quizTitle={quiz?.title as string}
+          isCompleted={isCompleted}
+        />
       </div>
       <div className="fixed inset-y-0 z-10 hidden h-full w-80 flex-col md:flex">
-        <CourseSidebar course={course} progressCount={progressCount} />
+        <CourseSidebar
+          course={course}
+          progressCount={progressCount}
+          quizId={quizId}
+          quizTitle={quiz?.title as string}
+          isCompleted={isCompleted}
+        />
       </div>
       <main className="h-full pt-[80px] md:pl-80">{children}</main>
     </div>

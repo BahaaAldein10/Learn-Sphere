@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 import { createUser, deleteUser, updateUser } from '@/lib/actions/user.actions';
-import { handleError } from '@/lib/utils';
 import { WebhookEvent } from '@clerk/nextjs/server';
 import { headers } from 'next/headers';
 import { Webhook } from 'svix';
@@ -65,7 +64,7 @@ export async function POST(req: Request) {
 
       return new Response('User created', { status: 200 });
     } catch (error) {
-      handleError(error);
+      console.log(error);
       return new Response('Error occurred', { status: 500 });
     }
   }
@@ -83,7 +82,7 @@ export async function POST(req: Request) {
 
       return new Response('User updated', { status: 200 });
     } catch (error) {
-      handleError(error);
+      console.log(error);
       return new Response('Error occurred', { status: 500 });
     }
   }
@@ -96,7 +95,7 @@ export async function POST(req: Request) {
 
       return new Response('User deleted', { status: 200 });
     } catch (error) {
-      handleError(error);
+      console.log(error);
       return new Response('Error occurred', { status: 500 });
     }
   }

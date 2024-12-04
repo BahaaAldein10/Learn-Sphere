@@ -1,7 +1,6 @@
 'use client';
 
 import { updateProgress } from '@/lib/actions/chapter.actions';
-import { handleError } from '@/lib/utils';
 import { useConfettiStore } from '@/store/confettiStore';
 import { useAuth } from '@clerk/nextjs';
 import { Loader2, Lock } from 'lucide-react';
@@ -55,7 +54,7 @@ const VideoPlayer = ({
           router.refresh();
         }
       } catch (error) {
-        handleError(error);
+        console.log(error);
         toast.error('Something went wrong');
       }
   };

@@ -1,4 +1,3 @@
-import { handleError } from '@/lib/utils';
 import Groq from 'groq-sdk';
 import { NextResponse } from 'next/server';
 
@@ -37,7 +36,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ response: responseContent }, { status: 200 });
   } catch (error) {
-    handleError(error);
+    console.log(error);
     return NextResponse.json(
       { error: 'An unexpected error occurred. Please try again later.' },
       { status: 500 }

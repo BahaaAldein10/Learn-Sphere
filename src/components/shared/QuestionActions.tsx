@@ -1,9 +1,8 @@
 'use client';
 
 import { deleteQuestion } from '@/lib/actions/question.actions';
-import { handleError } from '@/lib/utils';
 import { useAuth } from '@clerk/nextjs';
-import { Edit, Trash2 } from 'lucide-react'; // Import Lucide icons
+import { Edit, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -26,7 +25,7 @@ const QuestionActions = ({ questionId }: { questionId: string }) => {
       toast.success('Question deleted');
       router.push('/forum');
     } catch (error) {
-      handleError(error);
+      console.log(error);
     } finally {
       setIsLoading(false);
     }

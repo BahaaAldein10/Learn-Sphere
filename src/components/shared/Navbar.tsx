@@ -27,23 +27,19 @@ const Navbar = () => {
     fetchUserRole();
   }, [userId]);
 
-  const teacherMode =
-    pathname.includes('/teacher') ||
-    (pathname.includes('/courses') && pathname.includes('/chapters'));
-  const studentMode =
-    pathname.includes('/courses') && pathname.includes('/chapters');
-  const isNotRootPath = pathname !== '/';
-  const isCourseOrChapter =
+  const isInCourseOrQuizPage =
     pathname.includes('/courses') &&
-    pathname.includes('/chapters') &&
-    !pathname.startsWith('/teacher');
+    (pathname.includes('/chapters') || pathname.includes('/quiz'));
+  const teacherMode =
+    pathname.includes('/teacher') || pathname.includes('/teacher/courses');
+  const isNotRootPath = pathname !== '/';
 
   return (
     <nav
-      className={`flex size-full items-center ${isNotRootPath && !isCourseOrChapter && 'border-b shadow-sm'} bg-white p-4 text-gray-900`}
+      className={`flex size-full items-center ${isNotRootPath && !isInCourseOrQuizPage && 'border-b shadow-sm'} bg-white p-4 text-gray-900`}
     >
       <div className="flex-between w-full">
-        {!isCourseOrChapter && <MobileSidebar />}
+        {!isInCourseOrQuizPage && <MobileSidebar />}
 
         {pathname === '/courses' ? (
           <SearchInput placeholder="Search for a Course..." />
@@ -67,18 +63,17 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="flex-center gap-2">
-            <Link
-              href="/courses"
-              className={`${studentMode ? 'block' : 'hidden'}`}
-            >
-              <Button
-                variant="ghost"
-                className="flex-center gap-2 text-base font-semibold"
-              >
-                {studentMode && <LogOut />}
-                {studentMode && <span>Exit</span>}
-              </Button>
-            </Link>
+            {isInCourseOrQuizPage && (
+              <Link href="/courses">
+                <Button
+                  variant="ghost"
+                  className="flex-center gap-2 text-base font-semibold"
+                >
+                  <LogOut />
+                  Exit
+                </Button>
+              </Link>
+            )}
 
             <UserButton />
           </div>

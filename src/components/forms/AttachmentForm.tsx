@@ -4,7 +4,6 @@ import {
   createAttachment,
   deleteAttachment,
 } from '@/lib/actions/course.actions';
-import { handleError } from '@/lib/utils';
 import { File, Loader2, PlusCircle, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -84,7 +83,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
       toast.success('Attachment deleted');
       router.refresh();
     } catch (error) {
-      handleError(error);
+      console.log(error);
       toast.error('Something went wrong');
     } finally {
       setDeletingId(null);
@@ -92,7 +91,7 @@ const AttachmentForm = ({ initialData, courseId }: AttachmentFormProps) => {
   }
 
   return (
-    <div className="mt-6 rounded-lg bg-slate-50 p-6 shadow-md">
+    <div className="mt-6 rounded-lg bg-gray-50 p-6 shadow-md">
       <div className="flex items-center justify-between text-lg font-semibold text-gray-700">
         Course Attachments
         <Button

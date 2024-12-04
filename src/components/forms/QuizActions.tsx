@@ -1,6 +1,6 @@
 'use client';
 
-import { deleteChapter, publishChapter } from '@/lib/actions/chapter.actions';
+import { deleteQuiz, publishQuiz } from '@/lib/actions/quiz.actions';
 import { Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -8,19 +8,19 @@ import toast from 'react-hot-toast';
 import ConfirmModal from '../shared/ConfirmModal';
 import { Button } from '../ui/button';
 
-interface ChapterActionsProps {
+interface QuizActionsProps {
   disabled: boolean;
   courseId: string;
-  chapterId: string;
+  quizId: string;
   isPublished: boolean;
 }
 
-const ChapterActions = ({
+const QuizActions = ({
   disabled,
-  courseId,
-  chapterId,
   isPublished,
-}: ChapterActionsProps) => {
+  courseId,
+  quizId,
+}: QuizActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -28,14 +28,13 @@ const ChapterActions = ({
     try {
       setIsLoading(true);
 
-      await publishChapter({
-        chapterId,
-        courseId,
+      await publishQuiz({
+        quizId,
         isPublished,
       });
 
       toast.success(
-        `Chapter ${isPublished === true ? 'unpublished' : 'published'}`
+        `Quiz ${isPublished === true ? 'unpublished' : 'published'}`
       );
       router.refresh();
     } catch (error) {
@@ -50,12 +49,11 @@ const ChapterActions = ({
     try {
       setIsLoading(true);
 
-      await deleteChapter({
-        chapterId,
-        courseId,
+      await deleteQuiz({
+        quizId,
       });
 
-      toast.success('Chapter deleted');
+      toast.success('Quiz deleted');
       router.push(`/teacher/courses/${courseId}`);
     } catch (error) {
       console.log(error);
@@ -76,8 +74,12 @@ const ChapterActions = ({
         {isPublished ? 'Unpublish' : 'Publish'}
       </Button>
 
-      <ConfirmModal onDelete={handleDelete} type="chapter">
-        <Button disabled={isLoading}>
+      <ConfirmModal onDelete={handleDelete} type="quiz">
+        <Button
+          disabled={isLoading}
+          size="icon"
+          className="bg-red-500 hover:bg-red-500/90"
+        >
           <Trash className="size-4" />
         </Button>
       </ConfirmModal>
@@ -85,4 +87,4 @@ const ChapterActions = ({
   );
 };
 
-export default ChapterActions;
+export default QuizActions;

@@ -45,6 +45,7 @@ const CourseProgressButton = ({
 
       if (!isCompleted && !nextChapterId) {
         confetti.onOpen();
+        router.push(`/courses/${courseId}/quiz`);
       }
 
       if (!isCompleted && nextChapterId) {

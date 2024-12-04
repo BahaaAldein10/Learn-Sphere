@@ -10,11 +10,17 @@ interface CourseMobileSidebarProps {
     })[];
   };
   progressCount: number;
+  quizId: string | undefined;
+  quizTitle: string;
+  isCompleted: boolean;
 }
 
 export const CourseMobileSidebar = ({
   course,
+  quizId,
+  quizTitle,
   progressCount,
+  isCompleted,
 }: CourseMobileSidebarProps) => {
   return (
     <Sheet>
@@ -22,7 +28,13 @@ export const CourseMobileSidebar = ({
         <Menu size={30} className="text-gray-900" />
       </SheetTrigger>
       <SheetContent side="left" className="w-64 p-0">
-        <CourseSidebar course={course} progressCount={progressCount} />
+        <CourseSidebar
+          course={course}
+          progressCount={progressCount}
+          quizId={quizId}
+          quizTitle={quizTitle}
+          isCompleted={isCompleted}
+        />
       </SheetContent>
     </Sheet>
   );

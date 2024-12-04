@@ -42,7 +42,7 @@ const ButtonAnimatedGradient = () => {
         onBlur={handleBlur}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="relative z-10 inline-flex h-12 w-fit cursor-pointer items-center justify-center overflow-hidden rounded-md bg-purple-700 px-6 font-medium text-white"
+        className="relative z-10 inline-flex h-11 w-fit cursor-pointer items-center justify-center overflow-hidden rounded-md bg-purple-700 px-6 font-medium text-white"
         style={{
           fontSize: 'inherit',
           fontFamily: 'inherit',

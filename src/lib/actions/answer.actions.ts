@@ -1,7 +1,6 @@
 'use server';
 
 import prisma from '../db';
-import { handleError } from '../utils';
 
 interface CreateAnswerParams {
   userId: string;
@@ -23,7 +22,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 
     return answer;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -37,7 +36,7 @@ export async function getAllAnswers(questionId: string) {
 
     return answers;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -51,6 +50,6 @@ export async function getUserByAnswer({ userId }: { userId: string }) {
 
     return user;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }

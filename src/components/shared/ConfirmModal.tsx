@@ -28,14 +28,16 @@ const ConfirmModal = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your{' '}
-            {type}.
+            This will permanently delete your {type}.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => onDelete()}>
+          <AlertDialogAction
+            onClick={() => onDelete()}
+            className="bg-red-600 hover:bg-red-600/90"
+          >
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>

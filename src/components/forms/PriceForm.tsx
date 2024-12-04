@@ -75,7 +75,7 @@ const PriceForm = ({ initialData, courseId }: PriceFormProps) => {
   };
 
   return (
-    <div className="mt-6 rounded-lg bg-slate-50 p-6 shadow-md">
+    <div className="mt-6 rounded-lg bg-gray-50 p-6 shadow-md">
       <div className="flex items-center justify-between text-lg font-semibold text-gray-700">
         Course Price
         <Button

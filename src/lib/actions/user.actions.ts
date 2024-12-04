@@ -1,7 +1,6 @@
 'use server';
 /* eslint-disable camelcase */
 import prisma from '../db';
-import { handleError } from '../utils';
 
 interface CreateUserParams {
   userId: string;
@@ -31,7 +30,7 @@ export async function createUser(params: CreateUserParams) {
 
     return user;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -53,7 +52,7 @@ export async function updateUser(params: CreateUserParams) {
 
     return user;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -77,7 +76,7 @@ export async function deleteUser(id: string | undefined) {
       },
     });
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -93,7 +92,7 @@ export async function getUser(params: GetUserParams) {
 
     return user;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -112,6 +111,6 @@ export async function isTeacher(params: GetUserParams) {
 
     return user?.role === 'TEACHER';
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }

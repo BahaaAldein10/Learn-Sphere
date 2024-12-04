@@ -13,7 +13,6 @@ import {
 } from '@/types';
 import { Attachment, Chapter } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { handleError } from '../utils';
 
 export async function createChapter(params: CreateChapterParams) {
   try {
@@ -38,7 +37,7 @@ export async function createChapter(params: CreateChapterParams) {
 
     return chapter;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -57,7 +56,7 @@ export async function updateChapter(params: UpdateChapterParams) {
       });
     }
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -77,7 +76,7 @@ export async function updateChapterForm(params: UpdateChapterFormParams) {
 
     return chapter;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -121,7 +120,7 @@ export async function deleteChapter(params: DeleteChapterParams) {
 
     return deletedChapter;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -159,7 +158,7 @@ export async function publishChapter(params: PublishChapterParams) {
 
     return publishedChapter;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -189,7 +188,7 @@ export async function getProgress(params: GetProgressParams) {
 
     return progressPercentage;
   } catch (error) {
-    handleError(error);
+    console.log(error);
     return 0;
   }
 }
@@ -272,7 +271,7 @@ export async function getChapter(params: GetChapterParams) {
       videoUrl,
     };
   } catch (error) {
-    handleError(error);
+    console.log(error);
     return {
       chapter: null,
       course: null,
@@ -308,6 +307,6 @@ export async function updateProgress(params: UpdateProgressParams) {
 
     return progress;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }

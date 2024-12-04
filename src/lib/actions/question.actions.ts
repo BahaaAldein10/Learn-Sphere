@@ -4,7 +4,6 @@ import { Prisma } from '@prisma/client';
 import { addHours } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 import prisma from '../db';
-import { handleError } from '../utils';
 
 interface CreateQuestionParams {
   values: {
@@ -120,7 +119,7 @@ export async function getQuestionById({ id }: { id: string }) {
 
     return question;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -136,7 +135,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
     return question;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -155,7 +154,7 @@ export async function updateQuestion(params: UpdateQuestionParams) {
 
     return question;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -167,7 +166,7 @@ export async function deleteQuestion(questionId: string) {
       },
     });
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -185,7 +184,7 @@ export async function getCategoryIdByName({
 
     return category?.id;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -203,7 +202,7 @@ export async function getCategoryNameById({
 
     return category?.name;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -217,7 +216,7 @@ export async function getAllCategories() {
 
     return categories;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -290,7 +289,7 @@ export async function likeQuestion(params: LikeQuestionParams) {
 
     return updatedQuestion;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -358,7 +357,7 @@ export async function disLikeQuestion(params: LikeQuestionParams) {
 
     return updatedQuestion;
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }
 
@@ -420,6 +419,6 @@ export async function viewQuestion(params: ViewQuestionParams) {
       revalidatePath(`/forum/${questionId}`);
     }
   } catch (error) {
-    handleError(error);
+    console.log(error);
   }
 }

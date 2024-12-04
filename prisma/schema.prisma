@@ -23,10 +23,52 @@ model Course {
   chapters    Chapter[]
   purchases   Purchase[]
 
+  quiz Quiz?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([categoryId])
+}
+
+model Quiz {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  courseId String @unique @db.ObjectId
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  title       String
+  isPublished Boolean @default(false)
+
+  questions QuizQuestion[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QuizQuestion {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  quizId String @db.ObjectId
+  quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  content String
+  options QuizOption[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([quizId])
+}
+
+model QuizOption {
+  id             String       @id @default(auto()) @map("_id") @db.ObjectId
+  quizQuestionId String       @db.ObjectId
+  quizQuestion   QuizQuestion @relation(fields: [quizQuestionId], references: [id], onDelete: Cascade)
+
+  content   String
+  isCorrect Boolean
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Chapter {

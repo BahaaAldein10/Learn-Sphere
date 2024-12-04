@@ -173,3 +173,48 @@ export type CoursesResult = {
   pageSize: number;
   totalCount: number;
 };
+
+export interface GetQuizParams {
+  quizId: string;
+}
+
+export interface CreateQuizParams {
+  title: string;
+  courseId: string;
+}
+
+export interface createQuizQuestionParams {
+  questionText: string;
+  quizId: string;
+  options: string[];
+  correctAnswer: string;
+}
+
+export interface getAllQuizQuestionsParams {
+  quizId: string;
+}
+
+export interface DeleteQuizQuestionParams {
+  questionId: string;
+}
+
+export interface UpdateQuizQuestionParams {
+  questionId: string;
+  questionText: string;
+  options: string[];
+  correctAnswer: string;
+}
+
+export interface PublishQuizParams {
+  quizId: string;
+  isPublished: boolean;
+}
+
+export interface deleteQuizParams {
+  quizId: string;
+}
+
+export interface UpdateQuizTitleParams {
+  quizId: string;
+  quizTitle: string;
+}

@@ -4,6 +4,7 @@ import { Chapter, Course, UserProgress } from '@prisma/client';
 import { redirect } from 'next/navigation';
 import { CourseProgress } from './CourseProgress';
 import { CourseSidebarItem } from './CourseSidebarItem';
+import CourseSidebarQuizButton from './CourseSidebarQuizButton';
 
 interface CourseSidebarProps {
   course: Course & {
@@ -12,14 +13,19 @@ interface CourseSidebarProps {
     })[];
   };
   progressCount: number;
+  quizId: string | undefined;
+  quizTitle: string;
+  isCompleted: boolean;
 }
 
 export const CourseSidebar = async ({
   course,
+  quizId,
+  quizTitle,
   progressCount,
+  isCompleted,
 }: CourseSidebarProps) => {
   const { userId } = auth();
-
   if (!userId) {
     return redirect('/');
   }
@@ -43,6 +49,7 @@ export const CourseSidebar = async ({
           </div>
         )}
       </div>
+
       <div className="flex w-full flex-col">
         {course.chapters.map((chapter) => (
           <CourseSidebarItem
@@ -54,6 +61,14 @@ export const CourseSidebar = async ({
             isLocked={!chapter.isFree && !purchase}
           />
         ))}
+
+        {quizId && isCompleted && (
+          <CourseSidebarQuizButton
+            courseId={course.id}
+            quizId={quizId}
+            quizTitle={quizTitle}
+          />
+        )}
       </div>
     </div>
   );
