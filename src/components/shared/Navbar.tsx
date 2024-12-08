@@ -30,15 +30,14 @@ const Navbar = () => {
   const isInCourseOrQuizPage =
     pathname.includes('/courses') &&
     (pathname.includes('/chapters') || pathname.includes('/quiz'));
-  const teacherMode =
-    pathname.includes('/teacher') || pathname.includes('/teacher/courses');
+  const teacherMode = pathname.includes('/teacher') || isInCourseOrQuizPage;
   const isNotRootPath = pathname !== '/';
 
   return (
     <nav
       className={`flex size-full items-center ${isNotRootPath && !isInCourseOrQuizPage && 'border-b shadow-sm'} bg-white p-4 text-gray-900`}
     >
-      <div className="flex-between w-full">
+      <div className="flex-between w-full gap-2">
         {!isInCourseOrQuizPage && <MobileSidebar />}
 
         {pathname === '/courses' ? (
