@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast';
 import { extractRouterConfig } from 'uploadthing/server';
 import { ourFileRouter } from './api/uploadthing/core';
 import './globals.css';
+import Provider from './Provider';
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
   title: 'Learn Sphere',
   description: 'AI-Powered Collaborative Learning Platform',
   icons: {
-    icon: '/public/assets/logo.png',
+    icon: '/assets/logo.png',
   },
 };
 
@@ -34,7 +35,7 @@ export default function RootLayout({
       <body className={poppins.className}>
         <ClerkProvider>
           <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
-          {children}
+          <Provider>{children}</Provider>
           <ConfettiProvider />
           <Toaster />
         </ClerkProvider>
