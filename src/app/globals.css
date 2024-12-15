@@ -223,13 +223,18 @@
 .cl-internal-1hp5nqm {
   @apply hidden;
 }
-
 .cl-formButtonPrimary {
   @apply bg-purple-800 hover:bg-purple-800/90;
 }
-
 .cl-avatarBox {
-  @apply size-8;
+  @apply size-8 border-none;
+}
+.cl-internal-c4jh7f {
+  all: unset;
+  cursor: pointer;
+}
+.cl-internal-c4jh7f:focus {
+  all: unset;
 }
 
 /* Uploadthing */
