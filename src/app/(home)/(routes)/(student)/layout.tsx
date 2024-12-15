@@ -16,7 +16,7 @@ export default function AppLayout({
             <Navbar />
           </div>
 
-          <div className="fixed inset-y-0 z-10 hidden h-full w-56 flex-col md:flex">
+          <div className="fixed inset-y-0 hidden h-full w-56 flex-col md:flex">
             <Sidebar />
           </div>
 

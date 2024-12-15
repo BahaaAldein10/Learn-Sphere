@@ -7,16 +7,16 @@ import Image from 'next/image';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Editor } from '../editor/Editor';
-import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import ActiveCollaborators from './ActiveCollaborators';
 import Loader from './Loader';
+import ShareModal from './ShareModal';
 
 const CollaborativeRoom = ({
   roomId,
   roomMetadata,
   currentUserType,
-  // users,
+  users,
 }: CollaborativeRoomProps) => {
   const [documentTitle, setDocumentTitle] = useState(roomMetadata.title);
   const [editing, setEditing] = useState(false);
@@ -83,7 +83,7 @@ const CollaborativeRoom = ({
       <ClientSideSuspense fallback={<Loader />}>
         <div
           ref={containerRef}
-          className="m-auto mb-4 flex max-w-2xl items-center justify-center gap-4"
+          className="z-50 m-auto mb-4 flex max-w-2xl items-center justify-center gap-4"
         >
           {editing && !loading ? (
             <Input
@@ -118,9 +118,18 @@ const CollaborativeRoom = ({
 
           {loading && <p className="text-sm text-gray-600">saving...</p>}
 
-          <Button>Share</Button>
+          {currentUserType === 'editor' && (
+            <ShareModal
+              roomId={roomId}
+              collaborators={users}
+              creatorId={roomMetadata.creatorId}
+              currentUserType={currentUserType}
+            />
+          )}
+
           <ActiveCollaborators />
         </div>
+
         <Editor roomId={roomId} currentUserType={currentUserType} />
       </ClientSideSuspense>
     </RoomProvider>

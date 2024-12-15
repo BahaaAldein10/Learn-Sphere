@@ -15,17 +15,18 @@ import {
   LiveblocksPlugin,
 } from '@liveblocks/react-lexical';
 import { useThreads } from '@liveblocks/react/suspense';
+import Comments from '../shared/Comments';
+import { DeleteModal } from '../shared/DeleteModal';
 import FloatingToolbarPlugin from './plugins/FloatingToolbarPlugin';
 import Theme from './plugins/Theme';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
-import Comments from '../shared/Comments';
 
 function Placeholder() {
   return <div className="editor-placeholder">Enter some rich text...</div>;
 }
 
 export function Editor({
-  // roomId,
+  roomId,
   currentUserType,
 }: {
   roomId: string;
@@ -49,7 +50,7 @@ export function Editor({
       <div className="editor-container size-full">
         <div className="toolbar-wrapper flex min-w-full justify-between">
           <ToolbarPlugin />
-          {/* {currentUserType === 'editor' && <DeleteModal roomId={roomId} />} */}
+          {currentUserType === 'editor' && <DeleteModal roomId={roomId} />}
         </div>
 
         <div className="editor-wrapper flex flex-col items-center justify-start">

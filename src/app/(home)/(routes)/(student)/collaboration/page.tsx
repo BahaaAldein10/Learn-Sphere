@@ -1,4 +1,5 @@
 import AddDocumentBtn from '@/components/shared/AddDocumentBtn';
+import { DeleteModal } from '@/components/shared/DeleteModal';
 import { getDocuments } from '@/lib/actions/room.actions';
 import { dateConverter } from '@/lib/utils';
 import { currentUser } from '@clerk/nextjs/server';
@@ -35,7 +36,7 @@ const Collaboration = async () => {
               email={clerkUser.emailAddresses[0].emailAddress}
             />
           </div>
-          
+
           <ul className="document-ul">
             {roomDocuments.data.map(({ id, metadata, createdAt }: RoomData) => (
               <li key={id} className="document-list-item">
@@ -60,7 +61,7 @@ const Collaboration = async () => {
                     </p>
                   </div>
                 </Link>
-                {/* <DeleteModal roomId={id} /> */}
+                <DeleteModal roomId={id} />
               </li>
             ))}
           </ul>

@@ -1,6 +1,7 @@
 'use client';
 
 import { getUser } from '@/lib/actions/user.actions';
+import { cn } from '@/lib/utils';
 import { useAuth, UserButton } from '@clerk/nextjs';
 import { Role } from '@prisma/client';
 import { LogOut } from 'lucide-react';
@@ -9,6 +10,7 @@ import { redirect, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { MobileSidebar } from './MobileSidebar';
+import Notification from './Notification';
 import SearchInput from './SearchInput';
 
 const Navbar = () => {
@@ -31,6 +33,7 @@ const Navbar = () => {
     pathname.includes('/courses') &&
     (pathname.includes('/chapters') || pathname.includes('/quiz'));
   const teacherMode = pathname.includes('/teacher') || isInCourseOrQuizPage;
+  const isCollaboration = pathname.includes('/collaboration');
   const isNotRootPath = pathname !== '/';
 
   return (
@@ -47,7 +50,7 @@ const Navbar = () => {
         )}
 
         {userRole === 'TEACHER' ? (
-          <div className="flex-center gap-2">
+          <div className={cn('flex-center', isCollaboration ? '' : 'gap-2')}>
             <Link href={teacherMode ? '/courses' : '/teacher/courses/'}>
               <Button
                 variant="ghost"
@@ -58,10 +61,13 @@ const Navbar = () => {
               </Button>
             </Link>
 
-            <UserButton />
+            <div className="flex gap-2">
+              {isCollaboration && <Notification />}
+              <UserButton />
+            </div>
           </div>
         ) : (
-          <div className="flex-center gap-2">
+          <div className={cn('flex-center', isCollaboration ? '' : 'gap-2')}>
             {isInCourseOrQuizPage && (
               <Link href="/courses">
                 <Button
@@ -74,7 +80,10 @@ const Navbar = () => {
               </Link>
             )}
 
-            <UserButton />
+            <div className="flex gap-2">
+              {isCollaboration && <Notification />}
+              <UserButton />
+            </div>
           </div>
         )}
       </div>
