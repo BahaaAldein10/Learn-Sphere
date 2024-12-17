@@ -103,8 +103,8 @@ const config: Config = {
         },
       },
       backgroundImage: {
-        doc: 'url(/assets/images/doc.png)',
-        modal: 'url(/assets/images/modal.png)',
+        doc: 'url(/assets/doc.png)',
+        modal: 'url(/assets/modal.png)',
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
