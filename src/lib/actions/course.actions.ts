@@ -160,7 +160,7 @@ export async function deleteAttachment(params: DeleteAttachmentParams) {
   try {
     const { attachmentId, courseId } = params;
 
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) return new NextResponse('Unauthorized', { status: 401 });
 
     const courseOwner = await prisma.course.findUnique({

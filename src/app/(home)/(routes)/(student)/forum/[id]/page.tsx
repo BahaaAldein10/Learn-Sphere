@@ -18,7 +18,7 @@ import Image from 'next/image';
 
 const QuestionPage = async ({ params }: ParamsProps) => {
   const { id } = params;
-  const { userId } = auth();
+  const { userId } = await auth();
 
   const question = await getQuestionById({ id });
   const categoryName = await getCategoryNameById({

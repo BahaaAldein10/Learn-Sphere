@@ -11,7 +11,7 @@ const QuizIdPage = async ({
 }) => {
   const { quizId, courseId } = params;
 
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return redirect('/');
 
   const quiz = await getQuiz({ quizId });

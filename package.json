@@ -12,7 +12,7 @@
     "seed": "node --loader ts-node/esm src/scripts/seed.ts"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.6.3",
+    "@clerk/nextjs": "^6.9.3",
     "@hello-pangea/dnd": "^17.0.0",
     "@hookform/resolvers": "^3.9.0",
     "@lexical/react": "^0.16.1",

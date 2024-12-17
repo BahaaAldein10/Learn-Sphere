@@ -121,7 +121,9 @@ export async function isTeacher(params: GetUserParams) {
 
 export async function getClerkUsers({ userIds }: { userIds: string[] }) {
   try {
-    const { data } = await clerkClient().users.getUserList({
+    const { data } = await (
+      await clerkClient()
+    ).users.getUserList({
       emailAddress: userIds,
     });
 

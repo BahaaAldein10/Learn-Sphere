@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 const Analytics = async () => {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return redirect('/');
 
   const teacher = await isTeacher({ userId });

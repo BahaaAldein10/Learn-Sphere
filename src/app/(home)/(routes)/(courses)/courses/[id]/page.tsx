@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 const CourseId = async ({ params }: ParamsProps) => {
   const { id } = params;
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) return redirect('/');
 

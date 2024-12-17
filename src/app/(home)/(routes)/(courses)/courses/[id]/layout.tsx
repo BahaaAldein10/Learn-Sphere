@@ -13,7 +13,7 @@ const CourseLayout = async ({
   children: React.ReactNode;
   params: { id: string };
 }) => {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) {
     return redirect('/');
   }

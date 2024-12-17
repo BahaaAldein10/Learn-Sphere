@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 const ChaptersPage = async ({ params }: { params: { id: string } }) => {
   const { id } = params;
 
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return redirect('/');
 
   const chapter = await prisma.chapter.findFirst({

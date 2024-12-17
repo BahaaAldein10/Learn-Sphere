@@ -23,7 +23,7 @@ import {
 import { redirect } from 'next/navigation';
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) {
     return redirect('/');

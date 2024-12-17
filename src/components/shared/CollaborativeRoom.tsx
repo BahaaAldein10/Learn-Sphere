@@ -5,7 +5,6 @@ import { CollaborativeRoomProps } from '@/types';
 import { ClientSideSuspense, RoomProvider } from '@liveblocks/react';
 import Image from 'next/image';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import { Editor } from '../editor/Editor';
 import { Input } from '../ui/input';
 import ActiveCollaborators from './ActiveCollaborators';
@@ -25,41 +24,42 @@ const CollaborativeRoom = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Reusable function for saving the title
-  const saveTitle = async () => {
-    if (documentTitle !== roomMetadata.title) {
+  const updateTitleHandler = async (e: KeyboardEvent) => {
+    if (e.key === 'Enter') {
       try {
         setLoading(true);
-        const updatedDocument = await updateDocument({
-          roomId,
-          title: documentTitle,
-        });
-        if (updatedDocument) {
-          setEditing(false);
+
+        if (documentTitle !== roomMetadata.title) {
+          const updatedDocument = await updateDocument({
+            roomId,
+            title: documentTitle,
+          });
+
+          if (updatedDocument) {
+            setEditing(false);
+          }
         }
-        toast.success('Title updated successfully');
       } catch (error) {
-        console.log(error);
-        toast.error('Something went wrong!');
+        console.error(error);
       } finally {
         setLoading(false);
+        setEditing(false);
       }
     }
   };
 
-  const updateTitleHandler = (e: KeyboardEvent) => {
-    if (e.key === 'Enter') saveTitle();
-  };
-
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = async (e: MouseEvent) => {
       if (
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
       ) {
-        saveTitle();
-        if (documentTitle === roomMetadata.title) {
-          setEditing(false);
+        setEditing(false);
+        if (documentTitle !== roomMetadata.title) {
+          await updateDocument({
+            roomId,
+            title: documentTitle,
+          });
         }
       }
     };
