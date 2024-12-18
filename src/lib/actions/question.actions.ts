@@ -1,7 +1,7 @@
 'use server';
 
 import { Prisma } from '@prisma/client';
-import { addHours } from 'date-fns';
+import { addMinutes } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 import prisma from '../db';
 
@@ -374,8 +374,8 @@ export async function viewQuestion(params: ViewQuestionParams) {
       throw new Error('questionId and userId are required.');
     }
 
-    // Define the view expiration time in hours
-    const viewExpiryHours = 1; // Change this as needed
+    // Define the view expiration time in minutes
+    const viewExpiryMinutes = 1; // Change this as needed
 
     // Check for an existing interaction with "view" action
     const existingInteraction = await prisma.interaction.findFirst({
@@ -391,7 +391,7 @@ export async function viewQuestion(params: ViewQuestionParams) {
 
     const now = new Date();
     const expirationTime = existingInteraction
-      ? addHours(new Date(existingInteraction.createdAt), viewExpiryHours)
+      ? addMinutes(new Date(existingInteraction.createdAt), viewExpiryMinutes)
       : new Date(0); // If no interaction, set to a past date to allow view count
 
     // Only increment if there's no recent view within the expiration period

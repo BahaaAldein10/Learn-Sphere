@@ -25,7 +25,7 @@ const formSchema = z.object({
   content: z
     .string()
     .min(30, 'Your answer must be at least 30 characters long.')
-    .max(3000, 'Answer cannot exceed 3000 characters.'),
+    .max(5000, 'Answer cannot exceed 3000 characters.'),
 });
 
 const AnswerForm = ({
@@ -35,7 +35,6 @@ const AnswerForm = ({
   questionId: string;
   questionTitle: string;
 }) => {
-  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { userId } = useAuth();
@@ -62,6 +61,7 @@ const AnswerForm = ({
 
       toast.success('Answer created');
       form.reset();
+      form.clearErrors();
       router.refresh();
     } catch (error) {
       toast.error('Something went wrong');
@@ -72,7 +72,6 @@ const AnswerForm = ({
   const handleGenerateAnswer = async () => {
     try {
       setLoading(true);
-      setAnswer('');
 
       const res = await fetch('/api/answer', {
         method: 'POST',
@@ -83,7 +82,8 @@ const AnswerForm = ({
       if (!res.ok) return toast.error('An unexpected error occurred.');
 
       const data = await res.json();
-      setAnswer(data.response);
+      form.setValue('content', data.response);
+      form.clearErrors();
     } catch {
       toast.error('Failed to connect to the server. Please try again later.');
     } finally {
@@ -121,7 +121,7 @@ const AnswerForm = ({
                 </div>
                 <FormControl>
                   <Editor
-                    value={answer}
+                    value={field.value}
                     onChange={field.onChange}
                     placeholder="Share your knowledge and insights about the question"
                   />

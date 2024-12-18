@@ -32,6 +32,9 @@ export async function getAllAnswers(questionId: string) {
       where: {
         questionId,
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
 
     return answers;
@@ -51,5 +54,17 @@ export async function getUserByAnswer({ userId }: { userId: string }) {
     return user;
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function deleteAnswer({ answerId }: { answerId: string }) {
+  try {
+    await prisma.answer.delete({
+      where: {
+        id: answerId,
+      },
+    });
+  } catch (error) {
+    console.error(error);
   }
 }

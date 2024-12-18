@@ -2,7 +2,7 @@
 
 import { deleteQuestion } from '@/lib/actions/question.actions';
 import { useAuth } from '@clerk/nextjs';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -45,10 +45,10 @@ const QuestionActions = ({ questionId }: { questionId: string }) => {
 
       <ConfirmModal onDelete={handleDelete} type="question">
         <Button
-          className="bg-red-500 text-white hover:bg-red-600"
+          variant='destructive'
           disabled={isLoading}
         >
-          <Trash2 className="mr-2 size-5 max-sm:mr-0" />
+          <Trash className="mr-2 size-5 max-sm:mr-0" />
           <span className="max-sm:hidden">Delete</span>
         </Button>
       </ConfirmModal>
