@@ -60,6 +60,12 @@ export interface CourseUpdateValues {
   price?: number | null;
 }
 
+export interface GetAllAnswersParams {
+  questionId: string;
+  pageNumber: number;
+  pageSize?: number;
+}
+
 export interface UpdateCourseParams {
   id: string;
   userId: string;

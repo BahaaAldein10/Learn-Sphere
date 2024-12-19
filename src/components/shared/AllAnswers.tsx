@@ -1,10 +1,20 @@
 import { getAllAnswers } from '@/lib/actions/answer.actions';
 import AnswerCard from './AnswerCard';
+import Pagination from './Pagination';
 
-const AllAnswers = async ({ questionId }: { questionId: string }) => {
-  const answers = await getAllAnswers(questionId);
+const AllAnswers = async ({
+  questionId,
+  searchParams,
+}: {
+  questionId: string;
+  searchParams?: { [key: string]: string | undefined };
+}) => {
+  const result = await getAllAnswers({
+    questionId,
+    pageNumber: searchParams?.page ? +searchParams.page : 1,
+  });
 
-  if (!answers || answers.length === 0) {
+  if (!result?.answers || result?.answers.length === 0) {
     return (
       <div className="mt-10 text-gray-600">
         No answers yet. Be the first to provide an answer!
@@ -15,12 +25,22 @@ const AllAnswers = async ({ questionId }: { questionId: string }) => {
   return (
     <div className="mt-10 space-y-8">
       <h3 className="text-lg font-semibold text-gray-800">
-        {answers.length} Answer{answers.length > 1 ? 's' : ''}
+        {result?.totalCount} Answer{result?.answers.length > 1 ? 's' : ''}
       </h3>
 
-      {answers.map((answer, index) => (
+      {result?.answers.map((answer, index) => (
         <AnswerCard key={index} answer={answer} />
       ))}
+
+      <div className="mt-10">
+        {result.totalCount > result.pageSize && (
+          <Pagination
+            currentPage={searchParams?.page ? +searchParams.page : 1}
+            totalItems={result.totalCount}
+            itemsPerPage={result.pageSize}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 'use server';
 
+import { GetAllAnswersParams } from '@/types';
 import prisma from '../db';
 
 interface CreateAnswerParams {
@@ -26,18 +27,30 @@ export async function createAnswer(params: CreateAnswerParams) {
   }
 }
 
-export async function getAllAnswers(questionId: string) {
+export async function getAllAnswers(params: GetAllAnswersParams) {
   try {
-    const answers = await prisma.answer.findMany({
-      where: {
-        questionId,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const { questionId, pageNumber = 1, pageSize = 10 } = params;
 
-    return answers;
+    const [answers, totalCount] = await prisma.$transaction([
+      prisma.answer.findMany({
+        where: {
+          questionId,
+        },
+        take: pageSize,
+        skip: (pageNumber - 1) * pageSize,
+        orderBy: {
+          createdAt: 'desc',
+        },
+      }),
+
+      prisma.answer.count({
+        where: {
+          questionId,
+        },
+      }),
+    ]);
+
+    return { answers, totalCount, pageSize };
   } catch (error) {
     console.log(error);
   }
