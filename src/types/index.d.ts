@@ -66,6 +66,10 @@ export interface GetAllAnswersParams {
   pageSize?: number;
 }
 
+export interface UpdateAnswerParams {
+  answerId: string;
+  answerContent: string;
+}
 export interface UpdateCourseParams {
   id: string;
   userId: string;

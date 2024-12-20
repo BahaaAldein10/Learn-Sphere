@@ -11,12 +11,12 @@ import {
 } from '@/lib/actions/question.actions';
 import { getUser } from '@/lib/actions/user.actions';
 import { formatTimeSince } from '@/lib/utils';
-import { ParamsProps } from '@/types';
+import { URLProps } from '@/types';
 import { auth } from '@clerk/nextjs/server';
 import { Eye, MessageCircle, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';
 
-const QuestionPage = async ({ params }: ParamsProps) => {
+const QuestionPage = async ({ params, searchParams }: URLProps) => {
   const { id } = params;
   const { userId } = await auth();
 
@@ -105,7 +105,7 @@ const QuestionPage = async ({ params }: ParamsProps) => {
         />
       </div>
 
-      <AllAnswers questionId={id} />
+      <AllAnswers questionId={id} searchParams={searchParams} />
 
       <AnswerForm questionId={id} questionTitle={question.title} />
     </section>

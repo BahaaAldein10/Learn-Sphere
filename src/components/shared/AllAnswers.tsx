@@ -1,4 +1,7 @@
-import { getAllAnswers } from '@/lib/actions/answer.actions';
+import { getAllAnswers, getUserByAnswer } from '@/lib/actions/answer.actions';
+import { auth } from '@clerk/nextjs/server';
+import { User } from '@prisma/client';
+import { redirect } from 'next/navigation';
 import AnswerCard from './AnswerCard';
 import Pagination from './Pagination';
 
@@ -7,12 +10,14 @@ const AllAnswers = async ({
   searchParams,
 }: {
   questionId: string;
-  searchParams?: { [key: string]: string | undefined };
+  searchParams: { [key: string]: string | undefined };
 }) => {
   const result = await getAllAnswers({
     questionId,
     pageNumber: searchParams?.page ? +searchParams.page : 1,
   });
+  const { userId } = await auth();
+  if (!userId) return redirect('/sign-in');
 
   if (!result?.answers || result?.answers.length === 0) {
     return (
@@ -24,12 +29,15 @@ const AllAnswers = async ({
 
   return (
     <div className="mt-10 space-y-8">
-      <h3 className="text-lg font-semibold text-gray-800">
-        {result?.totalCount} Answer{result?.answers.length > 1 ? 's' : ''}
-      </h3>
+      <h3 className="text-lg font-semibold text-gray-800">All Answers</h3>
 
-      {result?.answers.map((answer, index) => (
-        <AnswerCard key={index} answer={answer} />
+      {result?.answers.map(async (answer, index) => (
+        <AnswerCard
+          key={index}
+          answer={answer}
+          isAuthor={answer.clerkId === userId}
+          user={(await getUserByAnswer({ userId: answer.clerkId })) as User}
+        />
       ))}
 
       <div className="mt-10">

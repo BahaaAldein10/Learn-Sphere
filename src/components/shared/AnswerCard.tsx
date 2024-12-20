@@ -1,17 +1,63 @@
-import { getUserByAnswer } from '@/lib/actions/answer.actions';
+'use client';
+
+import { deleteAnswer, updateAnswer } from '@/lib/actions/answer.actions';
 import { formatTimeSince } from '@/lib/utils';
-import { auth } from '@clerk/nextjs/server';
-import { Answer } from '@prisma/client';
+import { Answer, User } from '@prisma/client';
+import { Edit, Loader2, Trash, X } from 'lucide-react';
 import Image from 'next/image';
-import AnswerActions from './AnswerActions';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { Button } from '../ui/button';
+import ConfirmModal from './ConfirmModal';
+import Editor from './Editor';
 import Preview from './Preview';
 
-const AnswerCard = async ({ answer }: { answer: Answer }) => {
-  const user = await getUserByAnswer({ userId: answer.clerkId });
-  if (!user) throw new Error('User not found!');
+const AnswerCard = ({
+  answer,
+  isAuthor,
+  user,
+}: {
+  answer: Answer;
+  isAuthor: boolean;
+  user: User;
+}) => {
+  const [answerContent, setAnswerContent] = useState(answer.content);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const clerkUser = auth();
-  const isAuthor = (await clerkUser).userId === user.clerkId;
+  const handleDeleteAnswer = async () => {
+    try {
+      setIsLoading(true);
+      await deleteAnswer({ answerId: answer.id });
+      toast.success('Answer deleted successfully');
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      toast.error('Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateAnswer = async () => {
+    try {
+      setIsLoading(true);
+      await updateAnswer({
+        answerId: answer.id,
+        answerContent,
+      });
+      setIsEditing(false);
+      toast.success('Answer updated successfully');
+      router.refresh();
+    } catch (error) {
+      console.log(error);
+      toast.error('Something went wrong');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div key={answer.id} className="rounded-lg border border-gray-200 p-4">
@@ -38,8 +84,20 @@ const AnswerCard = async ({ answer }: { answer: Answer }) => {
           </div>
 
           {isAuthor && (
-            <div>
-              <AnswerActions answerId={answer.id} />
+            <div className="flex gap-2">
+              <Button size="icon" disabled={isLoading}>
+                {isEditing ? (
+                  <X className="size-5" onClick={() => setIsEditing(false)} />
+                ) : (
+                  <Edit className="size-4" onClick={() => setIsEditing(true)} />
+                )}
+              </Button>
+
+              <ConfirmModal type="Answer" onDelete={handleDeleteAnswer}>
+                <Button variant="destructive" size="icon" disabled={isLoading}>
+                  <Trash className="size-4" />
+                </Button>
+              </ConfirmModal>
             </div>
           )}
         </div>
@@ -47,7 +105,38 @@ const AnswerCard = async ({ answer }: { answer: Answer }) => {
 
       {/* Answer Content */}
       <div className="mt-2">
-        <Preview value={answer.content} />
+        {isEditing ? (
+          <div className="space-y-4">
+            <Editor
+              value={answerContent}
+              onChange={(value: string) => setAnswerContent(value)}
+            />
+
+            <div className="flex items-center gap-4">
+              <Button disabled={isLoading} onClick={handleUpdateAnswer}>
+                {isLoading ? (
+                  <div className="flex-center gap-2">
+                    <Loader2 className="animate-spin" /> Updating...
+                  </div>
+                ) : (
+                  'Update'
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                disabled={isLoading}
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <Preview value={answer.content} />
+          </>
+        )}
       </div>
     </div>
   );

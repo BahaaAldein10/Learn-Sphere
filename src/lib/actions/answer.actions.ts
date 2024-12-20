@@ -1,7 +1,8 @@
 'use server';
 
-import { GetAllAnswersParams } from '@/types';
+import { GetAllAnswersParams, UpdateAnswerParams } from '@/types';
 import prisma from '../db';
+import { parseStringify } from '../utils';
 
 interface CreateAnswerParams {
   userId: string;
@@ -77,6 +78,25 @@ export async function deleteAnswer({ answerId }: { answerId: string }) {
         id: answerId,
       },
     });
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function updateAnswer(params: UpdateAnswerParams) {
+  try {
+    const { answerId, answerContent } = params;
+
+    const updatedAnswer = await prisma.answer.update({
+      where: {
+        id: answerId,
+      },
+      data: {
+        content: answerContent,
+      },
+    });
+
+    return parseStringify(updatedAnswer);
   } catch (error) {
     console.error(error);
   }
