@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-import { Category, Course, Purchase } from '@prisma/client';
+import { Category, Course, Purchase, Role } from '@prisma/client';
 import React from 'react';
 
 export interface UrlQueryParams {
@@ -231,6 +231,10 @@ export interface UpdateQuizTitleParams {
   quizTitle: string;
 }
 
+export interface UpdateUserRoleParams {
+  clerkId: string;
+  userRole: Role;
+}
 declare type SearchParamProps = {
   params: { [key: string]: string };
   searchParams: { [key: string]: string | string[] | undefined };

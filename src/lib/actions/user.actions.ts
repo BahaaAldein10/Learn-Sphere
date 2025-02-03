@@ -1,6 +1,7 @@
 'use server';
 
 /* eslint-disable camelcase */
+import { UpdateUserRoleParams } from '@/types';
 import { clerkClient } from '@clerk/nextjs/server';
 import prisma from '../db';
 import { liveblocks } from '../liveblocks';
@@ -68,6 +69,12 @@ export async function deleteUser(id: string | undefined) {
       },
     });
 
+    await prisma.course.deleteMany({
+      where: {
+        clerkId: id,
+      },
+    });
+
     await prisma.question.deleteMany({
       where: {
         clerkId: id,
@@ -100,6 +107,18 @@ export async function getUser(params: GetUserParams) {
   }
 }
 
+export async function getEmailByClerkId({ clerkId }: { clerkId: string }) {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { clerkId },
+    });
+
+    return user?.email;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function isTeacher(params: GetUserParams) {
   try {
     const { userId } = params;
@@ -119,6 +138,59 @@ export async function isTeacher(params: GetUserParams) {
   }
 }
 
+export async function isAdmin(params: GetUserParams) {
+  try {
+    const { userId } = params;
+
+    const user = await prisma.user.findUnique({
+      where: {
+        clerkId: userId,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    return user?.role === 'ADMIN';
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function getAdminUsers({ userId }: { userId: string }) {
+  try {
+    const users = await prisma.user.findMany({
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    const adminUsers = users.filter((user) => user.clerkId !== userId);
+
+    return adminUsers;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export async function updateUserRole(params: UpdateUserRoleParams) {
+  try {
+    const { clerkId, userRole } = params;
+
+    const user = await prisma.user.update({
+      where: {
+        clerkId,
+      },
+      data: {
+        role: userRole,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error(error);
+  }
+}
 export async function getClerkUsers({ userIds }: { userIds: string[] }) {
   try {
     const { data } = await (

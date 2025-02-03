@@ -10,6 +10,7 @@ import {
   ThumbsUp,
   TrendingUp,
   Users,
+  UsersRound,
 } from 'lucide-react';
 
 export const StudentSidebarLinks = [
@@ -50,6 +51,19 @@ export const TeacherSidebarLinks = [
     label: 'Analytics',
     route: '/teacher/analytics',
     Icon: ChartPie,
+  },
+];
+
+export const AdminSidebarLinks = [
+  {
+    label: 'Courses',
+    route: '/admin/courses',
+    Icon: Compass,
+  },
+  {
+    label: 'Users',
+    route: '/admin/users',
+    Icon: UsersRound,
   },
 ];
 

@@ -118,6 +118,59 @@ export async function getCourse(params: GetCourseParams) {
   }
 }
 
+export async function getAdminCourse({ id }: { id: string }) {
+  try {
+    const course = await prisma.course.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        attachments: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+        },
+        chapters: {
+          orderBy: {
+            position: 'asc',
+          },
+        },
+        quiz: true,
+      },
+    });
+
+    return course;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function getAdminCourses() {
+  try {
+    const allCourses = await prisma.course.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    const clerkIds = allCourses.map((course) => course.clerkId);
+
+    const users = await prisma.user.findMany({
+      where: { clerkId: { in: clerkIds } },
+      select: { clerkId: true, email: true },
+    });
+
+    const userMap = new Map(users.map((user) => [user.clerkId, user.email]));
+
+    return allCourses.map((course) => ({
+      ...course,
+      email: userMap.get(course.clerkId) || null, // Attach email
+    }));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export async function updateCourse(params: UpdateCourseParams) {
   try {
     const { id, values, userId } = params;

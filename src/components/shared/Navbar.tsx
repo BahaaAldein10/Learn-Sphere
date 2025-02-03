@@ -33,6 +33,7 @@ const Navbar = () => {
     pathname.includes('/courses') &&
     (pathname.includes('/chapters') || pathname.includes('/quiz'));
   const teacherMode = pathname.includes('/teacher') || isInCourseOrQuizPage;
+  const adminMode = pathname.includes('/admin');
   const isCollaboration = pathname.includes('/collaboration');
   const isNotRootPath = pathname !== '/';
 
@@ -57,7 +58,24 @@ const Navbar = () => {
                 className="flex gap-2 text-base font-semibold"
               >
                 {teacherMode && <LogOut />}
-                {teacherMode ? 'Exit' : 'Teacher Mode'}
+                {teacherMode ? 'Exit' : 'Teacher'}
+              </Button>
+            </Link>
+
+            <div className="flex gap-2">
+              {isCollaboration && <Notification />}
+              <UserButton />
+            </div>
+          </div>
+        ) : userRole === 'ADMIN' ? (
+          <div className={cn('flex-center', isCollaboration ? '' : 'gap-2')}>
+            <Link href={adminMode ? '/courses' : '/admin/courses/'}>
+              <Button
+                variant="ghost"
+                className="flex gap-2 text-base font-semibold"
+              >
+                {adminMode && <LogOut />}
+                {adminMode ? 'Exit' : 'Admin'}
               </Button>
             </Link>
 

@@ -21,6 +21,7 @@ import {
 } from '@tanstack/react-table';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -28,16 +29,20 @@ import { Input } from '../ui/input';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  mode: string;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  mode,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
+
+  const pathname = usePathname();
 
   const table = useReactTable({
     data,
@@ -57,21 +62,36 @@ export function DataTable<TData, TValue>({
   return (
     <div>
       <div className="flex items-center justify-between pb-4">
-        <Input
-          placeholder="Filter courses..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm focus-visible:ring-purple-700"
-        />
+        {pathname.includes('courses') ? (
+          <Input
+            placeholder="Search courses..."
+            value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+            onChange={(event) =>
+              table.getColumn('name')?.setFilterValue(event.target.value)
+            }
+            className="max-w-sm focus-visible:ring-purple-700"
+          />
+        ) : (
+          <Input
+            placeholder="Search users by username..."
+            value={
+              (table.getColumn('username')?.getFilterValue() as string) ?? ''
+            }
+            onChange={(event) => {
+              table.getColumn('username')?.setFilterValue(event.target.value);
+            }}
+            className="max-w-sm focus-visible:ring-purple-700"
+          />
+        )}
 
-        <Link href="/teacher/create">
-          <Button>
-            <PlusCircle className="mr-2 size-4" />
-            New Course
-          </Button>
-        </Link>
+        {mode === 'Teacher' && (
+          <Link href="/teacher/create">
+            <Button>
+              <PlusCircle className="mr-2 size-4" />
+              New Course
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="rounded-md border">

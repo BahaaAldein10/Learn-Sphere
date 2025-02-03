@@ -1,6 +1,10 @@
 'use client';
 
-import { StudentSidebarLinks, TeacherSidebarLinks } from '@/constants';
+import {
+  AdminSidebarLinks,
+  StudentSidebarLinks,
+  TeacherSidebarLinks,
+} from '@/constants';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,8 +13,13 @@ import { usePathname } from 'next/navigation';
 const Sidebar = () => {
   const pathname = usePathname();
 
-  const currentRoutes = pathname.includes('/teacher');
-  const routes = currentRoutes ? TeacherSidebarLinks : StudentSidebarLinks;
+  const teacherRoutes = pathname.includes('/teacher');
+  const adminRoutes = pathname.includes('/admin');
+  const routes = teacherRoutes
+    ? TeacherSidebarLinks
+    : adminRoutes
+      ? AdminSidebarLinks
+      : StudentSidebarLinks;
 
   return (
     <div

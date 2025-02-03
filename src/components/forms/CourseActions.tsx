@@ -13,12 +13,14 @@ interface CourseActionsProps {
   disabled: boolean;
   courseId: string;
   isPublished: boolean;
+  isAdmin?: boolean;
 }
 
 const CourseActions = ({
   disabled,
   courseId,
   isPublished,
+  isAdmin,
 }: CourseActionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -59,7 +61,12 @@ const CourseActions = ({
       });
 
       toast.success('Course deleted');
-      router.push(`/teacher/courses`);
+
+      if (isAdmin) {
+        router.push(`/admin/courses`);
+      } else {
+        router.push(`/teacher/courses`);
+      }
       router.refresh();
     } catch (error) {
       console.log(error);
