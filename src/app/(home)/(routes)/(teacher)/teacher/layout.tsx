@@ -1,18 +1,9 @@
 import Navbar from '@/components/shared/Navbar';
 import Sidebar from '@/components/shared/Sidebar';
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs';
-import { Metadata } from 'next';
 import React from 'react';
 
-export const metadata: Metadata = {
-  title: 'Admin Dashboard | LearnSphere',
-  description:
-    'Manage courses, users, roles, and permissions on LearnSphere. Admins can update and remove courses, oversee user accounts, and control access levels.',
-  keywords:
-    'admin dashboard, course management, user roles, permissions, account management, course administration, LearnSphere admin panel',
-};
-
-export default function AdminLayout({
+export default function TeacherLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
