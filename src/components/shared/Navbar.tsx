@@ -33,7 +33,7 @@ const Navbar = () => {
     pathname.includes('/courses') &&
     (pathname.includes('/chapters') || pathname.includes('/quiz'));
   const teacherMode = pathname.includes('/teacher') || isInCourseOrQuizPage;
-  const adminMode = pathname.includes('/admin');
+  const adminMode = pathname.includes('/admin') || isInCourseOrQuizPage;
   const isCollaboration = pathname.includes('/collaboration');
   const isNotRootPath = pathname !== '/';
 
