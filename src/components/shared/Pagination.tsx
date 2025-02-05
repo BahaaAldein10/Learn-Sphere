@@ -1,6 +1,6 @@
 'use client';
 
-import { formUrlQuery } from '@/lib/utils';
+import { cn, formUrlQuery } from '@/lib/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
@@ -9,14 +9,18 @@ interface PaginationProps {
   totalItems: number;
   itemsPerPage: number;
   currentPage: number;
+  maxVisiblePages?: number;
+  buttonColor?: string;
 }
 
 const Pagination = ({
   totalItems,
   itemsPerPage,
   currentPage,
+  maxVisiblePages = 5,
+  buttonColor = 'purple',
 }: PaginationProps) => {
-  const [maxVisiblePages, setMaxVisiblePages] = useState(5);
+  const [maxPages, setMaxPages] = useState(maxVisiblePages);
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -25,18 +29,17 @@ const Pagination = ({
   useEffect(() => {
     const updateVisiblePages = () => {
       if (window.innerWidth < 640) {
-        setMaxVisiblePages(3);
+        setMaxPages(3);
       } else {
-        setMaxVisiblePages(5);
+        setMaxPages(maxVisiblePages);
       }
     };
 
     updateVisiblePages();
-
     window.addEventListener('resize', updateVisiblePages);
 
     return () => window.removeEventListener('resize', updateVisiblePages);
-  }, []);
+  }, [maxVisiblePages]);
 
   const handlePrevious = () => {
     if (currentPage > 1) {
@@ -63,22 +66,23 @@ const Pagination = ({
   };
 
   // Calculate the range of visible page numbers
-  const startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-  const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+  const startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+  const endPage = Math.min(totalPages, startPage + maxPages - 1);
 
   // Adjust the start page if you're near the end
-  const adjustedStartPage = Math.max(1, endPage - maxVisiblePages + 1);
+  const adjustedStartPage = Math.max(1, endPage - maxPages + 1);
 
   return (
     <div className="flex-center">
       <Button
         onClick={handlePrevious}
         disabled={currentPage === 1}
-        className={`mr-2 select-none ${
+        className={cn(
+          'mr-2 select-none',
           currentPage === 1
-            ? 'bg-gray-300 text-gray-500'
-            : 'bg-purple-600 text-white hover:bg-purple-700'
-        }`}
+            ? `bg-gray-300 text-gray-500`
+            : `bg-${buttonColor}-600 text-white hover:bg-${buttonColor}-700`
+        )}
       >
         Previous
       </Button>
@@ -117,11 +121,12 @@ const Pagination = ({
                 })
               )
             }
-            className={`mx-1 select-none ${
+            className={cn(
+              'mx-1 select-none',
               currentPage === pageNumber
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-            }`}
+                ? `bg-${buttonColor}-600 text-white`
+                : `bg-gray-200 text-gray-800 hover:bg-gray-300`
+            )}
           >
             {pageNumber}
           </Button>
@@ -149,11 +154,12 @@ const Pagination = ({
       <Button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className={`ml-2 select-none ${
+        className={cn(
+          'ml-2 select-none',
           currentPage === totalPages
-            ? 'bg-gray-300 text-gray-500'
-            : 'bg-purple-600 text-white hover:bg-purple-700'
-        }`}
+            ? `bg-gray-300 text-gray-500`
+            : `bg-${buttonColor}-600 text-white hover:bg-${buttonColor}-700`
+        )}
       >
         Next
       </Button>
