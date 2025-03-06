@@ -39,7 +39,8 @@ model Quiz {
   title       String
   isPublished Boolean @default(false)
 
-  questions QuizQuestion[]
+  questions  QuizQuestion[]
+  Submission Submission[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,6 +52,7 @@ model QuizQuestion {
   quiz   Quiz   @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   content String
+  type    String
   options QuizOption[]
 
   createdAt DateTime @default(now())
@@ -64,11 +66,29 @@ model QuizOption {
   quizQuestionId String       @db.ObjectId
   quizQuestion   QuizQuestion @relation(fields: [quizQuestionId], references: [id], onDelete: Cascade)
 
-  content   String
-  isCorrect Boolean
+  content   String?
+  isCorrect Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Submission {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  clerkId String @unique
+  user    User   @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
+
+  quizId String @db.ObjectId
+  quiz   Quiz   @relation(fields: [quizId], references: [id])
+
+  score         Float @default(0)
+  answers       Json
+  aiEvaluations Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clerkId, quizId])
 }
 
 model Chapter {
@@ -210,8 +230,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  question Question[]
-  answer   Answer[]
+  question   Question[]
+  answer     Answer[]
+  Submission Submission?
 }
 
 model Like {

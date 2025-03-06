@@ -22,7 +22,7 @@
     "@liveblocks/react": "^2.13.2",
     "@liveblocks/react-lexical": "^2.14.0",
     "@liveblocks/react-ui": "^2.13.2",
-    "@prisma/client": "^6.0.0",
+    "@prisma/client": "^6.4.1",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -80,7 +80,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.13",
     "postcss": "^8.4.47",
-    "prisma": "^6.3.1",
+    "prisma": "^6.4.1",
     "tailwindcss": "^3.4.14",
     "ts-node": "^10.9.2",
     "typescript": "^5"

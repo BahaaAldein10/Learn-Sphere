@@ -56,20 +56,34 @@ export async function createQuiz(params: CreateQuizParams) {
 
 export async function createQuizQuestion(params: createQuizQuestionParams) {
   try {
-    const { questionText, quizId, options, correctAnswer } = params;
+    const { questionText, quizId, options, correctAnswer, questionType } =
+      params;
 
-    const quizQuestion = await prisma.quizQuestion.create({
-      data: {
-        content: questionText,
-        quizId,
-        options: {
-          create: options.map((option) => ({
-            content: option,
-            isCorrect: option === correctAnswer,
-          })),
+    let quizQuestion;
+
+    if (questionType !== 'SHORT_ANSWER') {
+      quizQuestion = await prisma.quizQuestion.create({
+        data: {
+          content: questionText,
+          quizId,
+          type: questionType,
+          options: {
+            create: options?.map((option) => ({
+              content: option,
+              isCorrect: option === correctAnswer,
+            })),
+          },
         },
-      },
-    });
+      });
+    } else {
+      quizQuestion = await prisma.quizQuestion.create({
+        data: {
+          content: questionText,
+          quizId,
+          type: questionType,
+        },
+      });
+    }
 
     return quizQuestion;
   } catch (error) {
@@ -112,23 +126,39 @@ export async function deleteQuizQuestion(params: DeleteQuizQuestionParams) {
 
 export async function updateQuizQuestion(params: UpdateQuizQuestionParams) {
   try {
-    const { correctAnswer, options, questionId, questionText } = params;
+    const { correctAnswer, options, questionId, questionText, questionType } =
+      params;
 
-    const updatedQuestions = await prisma.quizQuestion.update({
-      where: {
-        id: questionId,
-      },
-      data: {
-        content: questionText,
-        options: {
-          deleteMany: {},
-          create: options.map((option) => ({
-            content: option,
-            isCorrect: option === correctAnswer,
-          })),
+    let updatedQuestions;
+
+    if (questionType !== 'SHORT_ANSWER') {
+      updatedQuestions = await prisma.quizQuestion.update({
+        where: {
+          id: questionId,
         },
-      },
-    });
+        data: {
+          content: questionText,
+          type: questionType,
+          options: {
+            deleteMany: {},
+            create: options?.map((option) => ({
+              content: option,
+              isCorrect: option === correctAnswer,
+            })),
+          },
+        },
+      });
+    } else {
+      updatedQuestions = await prisma.quizQuestion.update({
+        where: {
+          id: questionId,
+        },
+        data: {
+          content: questionText,
+          type: questionType,
+        },
+      });
+    }
 
     return updatedQuestions;
   } catch (error) {

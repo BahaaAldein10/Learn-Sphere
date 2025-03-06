@@ -14,10 +14,10 @@ import {
   createQuizQuestion,
   deleteQuizQuestion,
   updateQuizQuestion,
-} from '@/lib/actions/quiz.actions'; // Add update and delete actions
+} from '@/lib/actions/quiz.actions';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { QuizOption, QuizQuestion } from '@prisma/client';
-import { ArrowLeft, Edit3, Pencil, Trash } from 'lucide-react';
+import { ArrowLeft, Edit3, Pencil, Trash, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -35,13 +35,49 @@ import {
 import QuizActions from './QuizActions';
 import QuizTitleForm from './QuizTitleForm';
 
-const questionSchema = z.object({
-  questionText: z
-    .string()
-    .min(5, 'Question must be at least 5 characters long'),
-  options: z.array(z.string().min(1, 'Option cannot be empty')).length(4),
-  correctAnswer: z.string().min(1, 'Please select a correct answer'),
-});
+const questionSchema = z
+  .object({
+    questionText: z
+      .string()
+      .min(5, 'Question must be at least 5 characters long'),
+    questionType: z
+      .string()
+      .min(1, 'Please select a question type')
+      .refine((val) => ['MCQ', 'TRUE_FALSE', 'SHORT_ANSWER'].includes(val), {
+        message: 'Invalid question type',
+      }),
+    options: z
+      .array(
+        z.string().min(2, 'At least two characters are required for an option')
+      )
+      .max(4, 'At most four options are allowed')
+      .optional(),
+    correctAnswer: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.questionType && data.questionType !== 'SHORT_ANSWER') {
+      if (!data.options || data.options.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'At least two options are required',
+          path: ['options'],
+        });
+      }
+      if (!data.correctAnswer) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Please select a correct answer',
+          path: ['correctAnswer'],
+        });
+      } else if (!data.options?.includes(data.correctAnswer)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Correct answer must be one of the options',
+          path: ['correctAnswer'],
+        });
+      }
+    }
+  });
 
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
@@ -69,37 +105,49 @@ const QuizQuestionForm = ({
     resolver: zodResolver(questionSchema),
     defaultValues: {
       questionText: '',
-      options: ['', '', '', ''],
+      questionType: '',
+      options: [],
       correctAnswer: '',
     },
   });
 
-  const { handleSubmit, formState, reset, setValue } = form;
-  const { isSubmitting, isValid } = formState;
+  const { handleSubmit, formState, reset, setValue, watch } = form;
+  const { isSubmitting } = formState;
+  const questionType = watch('questionType');
+
+  const resetFields = () =>
+    reset({
+      questionText: '',
+      questionType: '',
+      options: [],
+      correctAnswer: '',
+    });
 
   const handleAddOrUpdateQuestion = async (values: QuestionFormValues) => {
+    const payload = {
+      quizId,
+      questionText: values.questionText,
+      questionType: values.questionType,
+      options:
+        values.questionType !== 'SHORT_ANSWER'
+          ? values.options || []
+          : undefined,
+      correctAnswer:
+        values.questionType !== 'SHORT_ANSWER'
+          ? (values.correctAnswer ?? '')
+          : undefined,
+    };
+
     try {
       if (editingQuestionId) {
-        // Update existing question
-        await updateQuizQuestion({
-          questionId: editingQuestionId,
-          correctAnswer: values.correctAnswer,
-          questionText: values.questionText,
-          options: values.options,
-        });
+        await updateQuizQuestion({ questionId: editingQuestionId, ...payload });
         toast.success('Question updated successfully!');
         setEditingQuestionId(null);
       } else {
-        // Add new question
-        await createQuizQuestion({
-          correctAnswer: values.correctAnswer,
-          questionText: values.questionText,
-          options: values.options,
-          quizId,
-        });
+        await createQuizQuestion(payload);
         toast.success('Question added successfully!');
       }
-      reset();
+      resetFields();
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -122,16 +170,18 @@ const QuizQuestionForm = ({
     question: QuizQuestion & { options: QuizOption[] }
   ) => {
     setEditingQuestionId(question.id);
-    setValue('questionText', question.content);
-    setValue(
-      'options',
-      question.options.map((option) => option.content)
-    );
-    setValue(
-      'correctAnswer',
-      question.options.find((option) => option.isCorrect)?.content || ''
-    );
-
+    reset({
+      questionText: question.content,
+      questionType: question.type,
+      options:
+        question.type !== 'SHORT_ANSWER'
+          ? (question.options.map((opt) => opt.content) as string[])
+          : [],
+      correctAnswer:
+        question.type !== 'SHORT_ANSWER'
+          ? question.options.find((opt) => opt.isCorrect)?.content || ''
+          : '',
+    });
     window.scrollTo({ top: isPublished ? 120 : 180, behavior: 'smooth' });
   };
 
@@ -185,49 +235,41 @@ const QuizQuestionForm = ({
                   </FormItem>
                 )}
               />
-              <div className="space-y-2">
-                <FormLabel>Options</FormLabel>
-                {form.watch('options').map((_, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <FormControl>
-                      <Input
-                        {...form.register(`options.${index}`)}
-                        placeholder={`Option ${index + 1}`}
-                      />
-                    </FormControl>
-                  </div>
-                ))}
-              </div>
 
-              {/* Correct Answer */}
               <FormField
                 control={form.control}
-                name="correctAnswer"
+                name="questionType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Correct Answer</FormLabel>
+                    <FormLabel>Question Type</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      disabled={form
-                        .watch('options')
-                        .some((option) => option.trim() === '')}
+                      value={field.value}
+                      onValueChange={(value: string) => {
+                        field.onChange(value);
+                        reset({
+                          questionText: watch('questionText'),
+                          questionType: value,
+                          options:
+                            value === 'MCQ'
+                              ? []
+                              : value === 'TRUE_FALSE'
+                                ? ['True', 'False']
+                                : [],
+                          correctAnswer: '',
+                        });
+                      }}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select Correct Answer" />
+                          <SelectValue placeholder="Select Question Type" />
                         </SelectTrigger>
                       </FormControl>
-
                       <SelectContent>
-                        {form
-                          .watch('options')
-                          .filter((option) => option.trim() !== '')
-                          .map((option, index) => (
-                            <SelectItem key={index} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
+                        <SelectItem value="MCQ">MCQ</SelectItem>
+                        <SelectItem value="TRUE_FALSE">True/False</SelectItem>
+                        <SelectItem value="SHORT_ANSWER">
+                          Short Answer
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -235,15 +277,111 @@ const QuizQuestionForm = ({
                 )}
               />
 
+              {questionType && questionType !== 'SHORT_ANSWER' && (
+                <>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <FormLabel>Options</FormLabel>
+                      {watch('options')?.map((_, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2"
+                        >
+                          <FormControl>
+                            {questionType === 'MCQ' ? (
+                              <div className="flex-center grow gap-4">
+                                <Input
+                                  {...form.register(`options.${index}`)}
+                                  placeholder={`Option ${index + 1}`}
+                                  className="flex-1"
+                                />
+                                <X
+                                  className="size-6 cursor-pointer text-red-600"
+                                  onClick={() => {
+                                    const updatedOptions = form
+                                      .watch('options')
+                                      ?.filter((_, idx) => index !== idx);
+                                    setValue('options', updatedOptions);
+                                  }}
+                                />
+                              </div>
+                            ) : (
+                              <Input
+                                {...form.register(`options.${index}`)}
+                                placeholder={`Option ${index + 1}`}
+                                readOnly
+                                className="cursor-context-menu"
+                              />
+                            )}
+                          </FormControl>
+                        </div>
+                      ))}
+                    </div>
+
+                    {questionType === 'MCQ' &&
+                      (watch('options')?.length ?? 0) < 4 && (
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            setValue('options', [
+                              ...(watch('options') || []),
+                              '',
+                            ]);
+                          }}
+                          className="mt-4"
+                        >
+                          Add Option
+                        </Button>
+                      )}
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="correctAnswer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Correct Answer</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={
+                            form
+                              .watch('options')
+                              ?.some((option) => option.trim() === '') ||
+                            watch('options')?.length === 0
+                          }
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Correct Answer" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {form
+                              .watch('options')
+                              ?.filter((option) => option.trim() !== '')
+                              .map((option, index) => (
+                                <SelectItem key={index} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
               <div className="flex items-center gap-2">
-                <Button type="submit" disabled={!isValid || isSubmitting}>
+                <Button type="submit" disabled={isSubmitting}>
                   {editingQuestionId ? 'Update Question' : 'Add Question'}
                 </Button>
-
                 {editingQuestionId && (
                   <Button
                     onClick={() => {
-                      form.reset();
+                      resetFields();
                       setEditingQuestionId(null);
                     }}
                   >
@@ -262,17 +400,10 @@ const QuizQuestionForm = ({
                 <div key={idx} className="rounded border bg-gray-100 p-4">
                   <div className="flex-between">
                     <h3 className="font-semibold">{`Q${idx + 1}: ${q.content}`}</h3>
-
                     <div className="flex gap-2">
-                      <Button
-                        size="icon"
-                        onClick={() => {
-                          handleEditQuestion(q);
-                        }}
-                      >
+                      <Button size="icon" onClick={() => handleEditQuestion(q)}>
                         <Pencil className="size-5" />
                       </Button>
-
                       <ConfirmModal
                         type="Question"
                         onDelete={() => handleDeleteQuestion(q.id)}
@@ -283,17 +414,19 @@ const QuizQuestionForm = ({
                       </ConfirmModal>
                     </div>
                   </div>
-
-                  <ul className="ml-5 list-disc">
-                    {q.options.map((option, i) => (
-                      <li key={i}>{option.content}</li>
-                    ))}
-                  </ul>
-
-                  <p className="font-semibold">
-                    Correct Answer:{' '}
-                    {q.options.find((option) => option.isCorrect)?.content}
-                  </p>
+                  {q.type !== 'SHORT_ANSWER' && (
+                    <>
+                      <ul className="ml-5 list-disc">
+                        {q.options.map((option, i) => (
+                          <li key={i}>{option.content}</li>
+                        ))}
+                      </ul>
+                      <p className="font-semibold">
+                        Correct Answer:{' '}
+                        {q.options.find((option) => option.isCorrect)?.content}
+                      </p>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

@@ -197,9 +197,10 @@ export interface CreateQuizParams {
 
 export interface createQuizQuestionParams {
   questionText: string;
+  questionType: string;
   quizId: string;
-  options: string[];
-  correctAnswer: string;
+  options?: string[];
+  correctAnswer?: string;
 }
 
 export interface getAllQuizQuestionsParams {
@@ -213,8 +214,9 @@ export interface DeleteQuizQuestionParams {
 export interface UpdateQuizQuestionParams {
   questionId: string;
   questionText: string;
-  options: string[];
-  correctAnswer: string;
+  questionType: string;
+  options?: string[];
+  correctAnswer?: string;
 }
 
 export interface PublishQuizParams {
