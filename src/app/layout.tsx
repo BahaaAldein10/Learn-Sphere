@@ -37,7 +37,7 @@ export default function RootLayout({
           <NextSSRPlugin routerConfig={extractRouterConfig(ourFileRouter)} />
           <Provider>{children}</Provider>
           <ConfettiProvider />
-          <Toaster />
+          <Toaster toastOptions={{ duration: 3000 }} />
         </ClerkProvider>
       </body>
     </html>
