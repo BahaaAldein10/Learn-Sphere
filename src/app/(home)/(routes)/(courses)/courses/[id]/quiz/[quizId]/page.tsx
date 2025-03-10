@@ -17,6 +17,7 @@ const QuizIdPage = async ({
       <QuizInterface
         quizTitle={quiz?.title as string}
         questions={quiz.questions}
+        language="English"
       />
     </div>
   );
