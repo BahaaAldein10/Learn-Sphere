@@ -36,11 +36,12 @@ model Quiz {
   courseId String @unique @db.ObjectId
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  title       String
-  isPublished Boolean @default(false)
+  title         String
+  isPublished   Boolean @default(false)
+  language      String?
+  timeInMinutes Int?
 
-  questions  QuizQuestion[]
-  Submission Submission[]
+  questions QuizQuestion[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -71,24 +72,6 @@ model QuizOption {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model Submission {
-  id      String @id @default(auto()) @map("_id") @db.ObjectId
-  clerkId String @unique
-  user    User   @relation(fields: [clerkId], references: [clerkId], onDelete: Cascade)
-
-  quizId String @db.ObjectId
-  quiz   Quiz   @relation(fields: [quizId], references: [id])
-
-  score         Float @default(0)
-  answers       Json
-  aiEvaluations Json?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([clerkId, quizId])
 }
 
 model Chapter {
@@ -230,9 +213,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  question   Question[]
-  answer     Answer[]
-  Submission Submission?
+  question Question[]
+  answer   Answer[]
 }
 
 model Like {

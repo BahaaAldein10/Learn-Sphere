@@ -44,6 +44,7 @@ const CourseLayout = async ({
   const quiz = await prisma.quiz.findUnique({
     where: {
       courseId: course?.id,
+      isPublished: true,
     },
   });
   const quizId = quiz?.id;

@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import Editor from '../shared/Editor';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 
 const formSchema = z.object({
   content: z
@@ -35,7 +35,8 @@ const AnswerForm = ({
   questionId: string;
   questionTitle: string;
 }) => {
-  const [loading, setLoading] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [loadingGenerate, setLoadingGenerate] = useState(false);
   const router = useRouter();
   const { userId } = useAuth();
 
@@ -53,6 +54,8 @@ const AnswerForm = ({
     }
 
     try {
+      setLoadingSubmit(true);
+
       await createAnswer({
         userId,
         questionId,
@@ -60,18 +63,21 @@ const AnswerForm = ({
       });
 
       toast.success('Answer created');
-      form.reset();
+
+      form.reset({ content: '' });
       form.clearErrors();
       router.refresh();
     } catch (error) {
       toast.error('Something went wrong');
       console.error(error);
+    } finally {
+      setLoadingSubmit(false);
     }
   }
 
   const handleGenerateAnswer = async () => {
     try {
-      setLoading(true);
+      setLoadingGenerate(true);
 
       const res = await fetch('/api/answer', {
         method: 'POST',
@@ -79,7 +85,9 @@ const AnswerForm = ({
         body: JSON.stringify({ question: questionTitle }),
       });
 
-      if (!res.ok) return toast.error('An unexpected error occurred.');
+      if (!res.ok) {
+        return toast.error('An unexpected error occurred.');
+      }
 
       const data = await res.json();
       form.setValue('content', data.response);
@@ -87,7 +95,7 @@ const AnswerForm = ({
     } catch {
       toast.error('Failed to connect to the server. Please try again later.');
     } finally {
-      setLoading(false);
+      setLoadingGenerate(false);
     }
   };
 
@@ -108,7 +116,7 @@ const AnswerForm = ({
                       e.preventDefault();
                       handleGenerateAnswer();
                     }}
-                    disabled={loading}
+                    disabled={loadingGenerate || loadingSubmit}
                   >
                     <Image
                       src="/assets/ai.png"
@@ -116,12 +124,14 @@ const AnswerForm = ({
                       width={24}
                       height={24}
                     />
-                    <span>{loading ? 'Generating...' : 'Generate Answer'}</span>
+                    <span>
+                      {loadingGenerate ? 'Generating...' : 'Generate Answer'}
+                    </span>
                   </Button>
                 </div>
                 <FormControl>
-                  <Editor
-                    value={field.value}
+                  <RichTextEditor
+                    content={field.value}
                     onChange={field.onChange}
                     placeholder="Share your knowledge and insights about the question"
                   />
@@ -135,11 +145,11 @@ const AnswerForm = ({
             )}
           />
 
-          <Button type="submit" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? (
+          <Button type="submit" disabled={loadingSubmit || loadingGenerate}>
+            {loadingSubmit ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="animate-spin text-white" />
-                Submitting
+                Submitting...
               </div>
             ) : (
               'Submit Your Answer'

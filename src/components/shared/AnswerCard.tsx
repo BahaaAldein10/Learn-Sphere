@@ -8,9 +8,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 import { Button } from '../ui/button';
 import ConfirmModal from './ConfirmModal';
-import Editor from './Editor';
 import Preview from './Preview';
 
 const AnswerCard = ({
@@ -107,11 +107,10 @@ const AnswerCard = ({
       <div className="mt-2">
         {isEditing ? (
           <div className="space-y-4">
-            <Editor
-              value={answerContent}
+            <RichTextEditor
+              content={answerContent}
               onChange={(value: string) => setAnswerContent(value)}
             />
-
             <div className="flex items-center gap-4">
               <Button disabled={isLoading} onClick={handleUpdateAnswer}>
                 {isLoading ? (

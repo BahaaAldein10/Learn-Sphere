@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import Editor from '../shared/Editor';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 import Preview from '../shared/Preview';
 import { Button } from '../ui/button';
 import {
@@ -132,7 +132,7 @@ const ChapterDescriptionForm = ({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Editor {...field} />
+                    <RichTextEditor {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

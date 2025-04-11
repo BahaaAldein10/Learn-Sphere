@@ -33,7 +33,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import QuizActions from './QuizActions';
-import QuizTitleForm from './QuizTitleForm';
+import QuizConfigurationForm from './QuizConfigurationForm';
 
 const questionSchema = z
   .object({
@@ -87,12 +87,16 @@ const QuizQuestionForm = ({
   quizId,
   questions,
   isPublished,
+  language,
+  time,
 }: {
   quizTitle: string;
   courseId: string;
   quizId: string;
   questions: (QuizQuestion & { options: QuizOption[] })[];
   isPublished: boolean;
+  language: string;
+  time: number;
 }) => {
   const router = useRouter();
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
@@ -214,7 +218,12 @@ const QuizQuestionForm = ({
           <h2 className="text-xl font-medium">Customize your quiz</h2>
         </div>
 
-        <QuizTitleForm quizTitle={quizTitle} quizId={quizId} />
+        <QuizConfigurationForm
+          quizTitle={quizTitle}
+          quizId={quizId}
+          language={language}
+          time={time}
+        />
 
         <div className="space-y-6">
           <Form {...form}>
@@ -253,7 +262,9 @@ const QuizQuestionForm = ({
                             value === 'MCQ'
                               ? []
                               : value === 'TRUE_FALSE'
-                                ? ['True', 'False']
+                                ? language === 'English'
+                                  ? ['True', 'False']
+                                  : ['صح', 'خطأ']
                                 : [],
                           correctAnswer: '',
                         });
@@ -265,10 +276,16 @@ const QuizQuestionForm = ({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="MCQ">MCQ</SelectItem>
-                        <SelectItem value="TRUE_FALSE">True/False</SelectItem>
+                        <SelectItem value="MCQ">
+                          {language === 'English' ? 'MCQ' : 'إختيار متعدد'}
+                        </SelectItem>
+                        <SelectItem value="TRUE_FALSE">
+                          {language === 'English' ? 'True/False' : 'صح/خطأ'}
+                        </SelectItem>
                         <SelectItem value="SHORT_ANSWER">
-                          Short Answer
+                          {language === 'English'
+                            ? 'Short Answer'
+                            : 'إجابة قصيرة'}
                         </SelectItem>
                       </SelectContent>
                     </Select>

@@ -44,10 +44,7 @@ const QuestionActions = ({ questionId }: { questionId: string }) => {
       </Button>
 
       <ConfirmModal onDelete={handleDelete} type="question">
-        <Button
-          variant='destructive'
-          disabled={isLoading}
-        >
+        <Button variant="destructive" disabled={isLoading}>
           <Trash className="mr-2 size-5 max-sm:mr-0" />
           <span className="max-sm:hidden">Delete</span>
         </Button>

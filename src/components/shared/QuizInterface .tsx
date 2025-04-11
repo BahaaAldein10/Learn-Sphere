@@ -1,25 +1,31 @@
 'use client';
 
+import { getLocalizedText } from '@/lib/localization';
 import { QuizOption, QuizQuestion } from '@prisma/client';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import Swal from 'sweetalert2';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 import { Button } from '../ui/button';
-import { Textarea } from '../ui/textarea';
 
 interface QuizInterfaceProps {
   quizTitle: string;
   questions: (QuizQuestion & { options: QuizOption[] })[];
   language: string;
+  time: number;
 }
 
 const QuizInterface = ({
   quizTitle,
   questions,
   language,
+  time: timeInMinutes,
 }: QuizInterfaceProps) => {
-  const TOTAL_TIME = questions.length * 60;
+  const localizedText = getLocalizedText(language);
+  const titleFontClass = language === 'Arabic' ? 'font-semibold' : 'font-bold';
+  const arabicFontClass = language === 'Arabic' ? 'font-semibold' : '';
+  const TOTAL_TIME = timeInMinutes * 60;
 
   const [quizStarted, setQuizStarted] = useState(false);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
@@ -34,6 +40,13 @@ const QuizInterface = ({
     Record<string, { score: number; feedback: string }>
   >({});
 
+  const correctAnswers = Object.fromEntries(
+    questions.map((q) => [
+      q.id,
+      q.options.find((opt) => opt.isCorrect)?.id ?? '',
+    ])
+  );
+
   const getReviewClass = (q: QuizQuestion & { options: QuizOption[] }) => {
     if (q.options.length > 0) {
       return selectedAnswers[q.id] === correctAnswers[q.id]
@@ -45,13 +58,6 @@ const QuizInterface = ({
         : 'border-red-400 bg-red-100';
     }
   };
-
-  const correctAnswers = Object.fromEntries(
-    questions.map((q) => [
-      q.id,
-      q.options.find((opt) => opt.isCorrect)?.id ?? '',
-    ])
-  );
 
   const currentQuestion = questions[currentQuestionIndex];
   const progressPercentage =
@@ -66,16 +72,13 @@ const QuizInterface = ({
 
     if (timeRemaining === 0) {
       clearInterval(timer);
-
-      setTimeout(() => toast('⏳ Time is up! Submitting...'), 0);
-
+      setTimeout(() => toast(localizedText.timeUpText), 0);
       setTimeout(handleSubmit, 2000);
     }
 
     return () => clearInterval(timer);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quizStarted, timeRemaining, quizSubmitted]);
+  }, [quizStarted, timeRemaining, quizSubmitted, localizedText.timeUpText]);
 
   const handleOptionSelect = (questionId: string, optionId: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: optionId }));
@@ -106,7 +109,7 @@ const QuizInterface = ({
         const res = await fetch('/api/grade', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ questions: shortAnswerPayload }),
+          body: JSON.stringify({ questions: shortAnswerPayload, language }),
         });
 
         if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
@@ -124,7 +127,7 @@ const QuizInterface = ({
         } else {
           const aiEvaluation = aiResults[question.id] || {
             score: 0,
-            feedback: 'No AI response',
+            feedback: localizedText.noAiResponseText,
           };
           updatedEvaluations[question.id] = aiEvaluation;
           if (aiEvaluation.score >= 0.7) {
@@ -134,7 +137,7 @@ const QuizInterface = ({
       }
     } catch (error) {
       console.error('Error grading short answers:', error);
-      toast.error('Error grading short answers. Try again later.');
+      toast.error(localizedText.shortAnswerErrorText);
     }
 
     setAiEvaluations((prev) => ({ ...prev, ...updatedEvaluations }));
@@ -161,44 +164,45 @@ const QuizInterface = ({
       {!quizStarted ? (
         <>
           {/* Header */}
-          <h1 className="text-center text-3xl font-bold">{quizTitle}</h1>
+          <h1 className={`text-center text-3xl ${titleFontClass}`}>
+            {quizTitle}
+          </h1>
 
           {/* Description */}
           <p className="mt-4 text-center text-lg text-gray-600">
-            Get ready to test your knowledge! This quiz consists of{' '}
+            {localizedText.getReadyText} {localizedText.quizConsistsOfText}{' '}
             <span className="font-semibold text-purple-600">
-              {questions.length} questions
+              {questions.length} {localizedText.questionsText}
             </span>
-            , and you have{' '}
+            , {localizedText.andYouHaveText}{' '}
             <span className="font-semibold text-red-600">
-              {Math.floor(TOTAL_TIME / 60)} minutes
+              {Math.floor(TOTAL_TIME / 60)} {localizedText.minutesText}
             </span>{' '}
-            to complete it.
+            {localizedText.completeText}.
           </p>
 
           {/* Quiz Info */}
           <div className="flex-between mt-6 w-full text-lg font-medium sm:px-6">
-            <p className="text-gray-700">📜 {questions.length} Questions</p>
             <p className="text-gray-700">
-              ⏳ {Math.floor(TOTAL_TIME / 60)} min
+              📜 {questions.length} {localizedText.questionsLabel}
+            </p>
+            <p className="text-gray-700">
+              ⏳ {Math.floor(TOTAL_TIME / 60)} {localizedText.minLabel}
             </p>
           </div>
 
           {/* Start Button */}
           <Button onClick={() => setQuizStarted(true)} className="mt-8 w-full">
-            Start Quiz 🚀
+            {localizedText.startQuizText}
           </Button>
         </>
       ) : (
         <>
           {/* Header */}
           <div className="flex-between mb-4 w-full">
-            <h1 className="text-2xl font-bold">{quizTitle}</h1>
+            <h1 className={`text-2xl ${titleFontClass}`}>{quizTitle}</h1>
             <div className="text-sm font-medium text-red-600">
-              {`Time Left: ${Math.floor(timeRemaining / 60)}:${(
-                '0' +
-                (timeRemaining % 60)
-              ).slice(-2)}`}
+              {`${localizedText.timeLeftText} ${Math.floor(timeRemaining / 60)}:${('0' + (timeRemaining % 60)).slice(-2)}`}
             </div>
           </div>
 
@@ -214,12 +218,14 @@ const QuizInterface = ({
             <div className="w-full text-center">
               {/* Quiz Submitted Header */}
               <h2 className="text-2xl font-semibold text-purple-700">
-                Quiz Completed! 🎉
+                {localizedText.quizCompletedText}
               </h2>
 
               {/* Score Display */}
               <div className="mt-4 flex flex-col items-center">
-                <p className="text-lg font-medium">Your Score</p>
+                <p className="text-lg font-medium">
+                  {localizedText.yourScoreText}
+                </p>
                 <div
                   className={`mt-2 flex size-24 items-center justify-center rounded-full text-xl font-bold ${
                     score / questions.length >= 0.7
@@ -237,22 +243,21 @@ const QuizInterface = ({
                   }`}
                 >
                   {score / questions.length >= 0.7
-                    ? '🎉 Great job! You passed!'
-                    : '😔 Try again for a better score!'}
+                    ? localizedText.greatJobText
+                    : localizedText.tryAgainText}
                 </p>
               </div>
 
               {/* Answer Review Section */}
               <div className="mt-6 w-full">
                 <h3 className="text-xl font-semibold text-gray-700">
-                  Review Your Answers
+                  {localizedText.reviewAnswersText}
                 </h3>
                 <div className="mt-4 space-y-4">
                   {questions.map((q, idx) => {
                     const isMultipleChoice = q.options.length > 0;
                     const isCorrect =
                       selectedAnswers[q.id] === correctAnswers[q.id];
-                    // Guard against undefined aiEvaluations entry.
                     const isAiCorrect = aiEvaluations[q.id]
                       ? aiEvaluations[q.id].score >= 0.7
                       : false;
@@ -261,12 +266,14 @@ const QuizInterface = ({
                         key={idx}
                         className={`rounded-lg border p-4 ${getReviewClass(q)}`}
                       >
-                        <p className="font-medium text-gray-800">{`Q${idx + 1}: ${q.content}`}</p>
+                        <p className="font-medium text-gray-800">
+                          {`${localizedText.questionLabel} ${idx + 1}: ${q.content}`}
+                        </p>
                         {isMultipleChoice ? (
                           <>
                             <p className="mt-1 text-sm text-gray-600">
                               <span className="font-semibold text-green-600">
-                                ✅ Correct:
+                                {localizedText.correctText}
                               </span>{' '}
                               {
                                 q.options.find(
@@ -280,11 +287,11 @@ const QuizInterface = ({
                               }`}
                             >
                               {isCorrect
-                                ? '✔ Your answer is correct'
-                                : `❌ Your Answer: ${
+                                ? localizedText.yourAnswerCorrectText
+                                : `${localizedText.yourAnswerIncorrectText} ${
                                     q.options.find(
                                       (opt) => opt.id === selectedAnswers[q.id]
-                                    )?.content || 'No Answer'
+                                    )?.content || localizedText.noAnswerText
                                   }`}
                             </p>
                           </>
@@ -292,15 +299,12 @@ const QuizInterface = ({
                           <>
                             <p className="mt-1 text-sm text-gray-600">
                               <span
-                                className={`font-semibold ${
-                                  isAiCorrect
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                                }`}
+                                className={`font-semibold ${isAiCorrect ? 'text-green-600' : 'text-red-600'}`}
                               >
-                                📝 Your Answer:
+                                {localizedText.yourAnswerText}
                               </span>{' '}
-                              {selectedAnswers[q.id] || 'No Answer'}
+                              {selectedAnswers[q.id] ||
+                                localizedText.noAnswerText}
                             </p>
                             {aiEvaluations[q.id] && (
                               <p
@@ -310,7 +314,8 @@ const QuizInterface = ({
                                     : 'text-red-600'
                                 }`}
                               >
-                                AI Grading: Score {aiEvaluations[q.id].score} –{' '}
+                                {localizedText.aiGradingText}{' '}
+                                {aiEvaluations[q.id].score} –{' '}
                                 {aiEvaluations[q.id].feedback}
                               </p>
                             )}
@@ -324,7 +329,7 @@ const QuizInterface = ({
 
               {/* Retake Quiz Button */}
               <Button onClick={handleRetakeQuiz} className="mt-6 w-full">
-                🔁 Retake Quiz
+                {localizedText.retakeQuizText}
               </Button>
             </div>
           ) : (
@@ -332,7 +337,7 @@ const QuizInterface = ({
               <div className="mb-6 w-full">
                 {/* Question Display */}
                 <h2 className="text-xl font-semibold">
-                  {`Question ${currentQuestionIndex + 1}: ${currentQuestion.content}`}
+                  {`${localizedText.questionText} ${currentQuestionIndex + 1}: ${currentQuestion.content}`}
                 </h2>
 
                 {/* Options */}
@@ -346,7 +351,7 @@ const QuizInterface = ({
                             ? 'default'
                             : 'outline'
                         }
-                        className="flex size-full justify-start whitespace-normal text-left"
+                        className={`${arabicFontClass} flex size-full justify-start whitespace-normal text-left`}
                         disabled={loading}
                         onClick={() =>
                           !loading &&
@@ -359,15 +364,15 @@ const QuizInterface = ({
                   </div>
                 ) : (
                   <div className="mt-4">
-                    <Textarea
-                      value={selectedAnswers[currentQuestion.id] || ''}
-                      rows={5}
+                    <RichTextEditor
+                      content={selectedAnswers[currentQuestion.id] || ''}
+                      language={language}
                       disabled={loading}
-                      onChange={(e) =>
+                      onChange={(value) =>
                         !loading &&
                         setSelectedAnswers((prev) => ({
                           ...prev,
-                          [currentQuestion.id]: e.target.value,
+                          [currentQuestion.id]: value,
                         }))
                       }
                     />
@@ -379,13 +384,13 @@ const QuizInterface = ({
               <div className="flex w-full justify-between">
                 <Button
                   type="button"
-                  disabled={loading || currentQuestionIndex === 0} // Disable on loading
+                  disabled={loading || currentQuestionIndex === 0}
                   onClick={() =>
                     !loading && setCurrentQuestionIndex((prev) => prev - 1)
                   }
                   aria-label="Go to previous question"
                 >
-                  Previous
+                  {localizedText.previousText}
                 </Button>
 
                 {currentQuestionIndex + 1 === questions.length ? (
@@ -394,16 +399,15 @@ const QuizInterface = ({
                       const unansweredQuestions = questions.some(
                         (q) => !selectedAnswers[q.id]
                       );
-
                       if (unansweredQuestions) {
                         Swal.fire({
-                          title: 'Unanswered Questions!',
-                          text: 'You have unanswered questions. Are you sure you want to submit?',
+                          title: localizedText.unansweredQuestionsTitle,
+                          text: localizedText.unansweredQuestionsText,
                           icon: 'warning',
                           showCancelButton: true,
                           confirmButtonColor: '#9333ea',
                           cancelButtonColor: '#dc2626',
-                          confirmButtonText: 'Yes, submit anyway',
+                          confirmButtonText: localizedText.submitAnywayText,
                         }).then((result) => {
                           if (result.isConfirmed) {
                             handleSubmit();
@@ -411,13 +415,13 @@ const QuizInterface = ({
                         });
                       } else {
                         Swal.fire({
-                          title: 'Are you sure?',
-                          text: 'Do you want to submit your answers?',
+                          title: localizedText.areYouSureTitle,
+                          text: localizedText.areYouSureText,
                           icon: 'warning',
                           showCancelButton: true,
                           confirmButtonColor: '#9333ea',
                           cancelButtonColor: '#dc2626',
-                          confirmButtonText: 'Yes, submit!',
+                          confirmButtonText: localizedText.yesSubmitText,
                         }).then((result) => {
                           if (result.isConfirmed) {
                             handleSubmit();
@@ -432,10 +436,10 @@ const QuizInterface = ({
                     {loading ? (
                       <div className="flex items-center gap-2">
                         <Loader2 className="animate-spin text-white" />
-                        Submitting...
+                        {localizedText.submittingText}
                       </div>
                     ) : (
-                      'Submit'
+                      localizedText.submitText
                     )}
                   </Button>
                 ) : (
@@ -447,7 +451,7 @@ const QuizInterface = ({
                     }
                     aria-label="Go to next question"
                   >
-                    Next
+                    {localizedText.nextText}
                   </Button>
                 )}
               </div>

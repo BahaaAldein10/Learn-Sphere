@@ -29,7 +29,7 @@ const Sidebar = () => {
         <Link href="/">
           <div className="flex items-center gap-2">
             <Image src={'/assets/logo.png'} alt="logo" width={40} height={40} />
-            <h6 className="select-none text-xl font-semibold">LearnSphere</h6>
+            <h6 className="text-xl font-semibold">LearnSphere</h6>
           </div>
         </Link>
       </div>
