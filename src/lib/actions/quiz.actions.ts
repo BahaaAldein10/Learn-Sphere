@@ -8,8 +8,8 @@ import {
   getAllQuizQuestionsParams,
   GetQuizParams,
   PublishQuizParams,
+  updateQuizConfigurationParams,
   UpdateQuizQuestionParams,
-  UpdateQuizTitleParams,
 } from '@/types';
 import prisma from '../db';
 
@@ -166,9 +166,11 @@ export async function updateQuizQuestion(params: UpdateQuizQuestionParams) {
   }
 }
 
-export async function updateQuizTitle(params: UpdateQuizTitleParams) {
+export async function updateQuizConfiguration(
+  params: updateQuizConfigurationParams
+) {
   try {
-    const { quizId, quizTitle } = params;
+    const { quizId, quizTitle, language, time } = params;
 
     const quiz = await prisma.quiz.update({
       where: {
@@ -176,6 +178,8 @@ export async function updateQuizTitle(params: UpdateQuizTitleParams) {
       },
       data: {
         title: quizTitle,
+        language,
+        timeInMinutes: time,
       },
     });
 

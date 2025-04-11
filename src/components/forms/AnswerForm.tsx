@@ -19,7 +19,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import Editor from '../shared/Editor';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 
 const formSchema = z.object({
   content: z
@@ -53,6 +53,8 @@ const AnswerForm = ({
     }
 
     try {
+      setLoading(true);
+
       await createAnswer({
         userId,
         questionId,
@@ -60,12 +62,15 @@ const AnswerForm = ({
       });
 
       toast.success('Answer created');
-      form.reset();
+
+      form.reset({ content: '' });
       form.clearErrors();
       router.refresh();
     } catch (error) {
       toast.error('Something went wrong');
       console.error(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -79,7 +84,9 @@ const AnswerForm = ({
         body: JSON.stringify({ question: questionTitle }),
       });
 
-      if (!res.ok) return toast.error('An unexpected error occurred.');
+      if (!res.ok) {
+        return toast.error('An unexpected error occurred.');
+      }
 
       const data = await res.json();
       form.setValue('content', data.response);
@@ -120,8 +127,8 @@ const AnswerForm = ({
                   </Button>
                 </div>
                 <FormControl>
-                  <Editor
-                    value={field.value}
+                  <RichTextEditor
+                    content={field.value}
                     onChange={field.onChange}
                     placeholder="Share your knowledge and insights about the question"
                   />

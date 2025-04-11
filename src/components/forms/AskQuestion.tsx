@@ -23,7 +23,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
-import Editor from '../shared/Editor';
+import RichTextEditor from '../RichTextEditor/RichTextEditor';
 import {
   Select,
   SelectContent,
@@ -130,7 +130,10 @@ const AskQuestionForm = ({ categories }: AskQuestionFormProps) => {
                   Question Description <span className="text-red-600">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Editor value={field.value} onChange={field.onChange} />
+                  <RichTextEditor
+                    content={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormDescription className="text-purple-600">
                   Introduce the problem and expand on what you put in the title.

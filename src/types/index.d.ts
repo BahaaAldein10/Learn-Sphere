@@ -228,9 +228,11 @@ export interface deleteQuizParams {
   quizId: string;
 }
 
-export interface UpdateQuizTitleParams {
+export interface updateQuizConfigurationParams {
   quizId: string;
   quizTitle: string;
+  language: string;
+  time: number;
 }
 
 export interface UpdateUserRoleParams {
