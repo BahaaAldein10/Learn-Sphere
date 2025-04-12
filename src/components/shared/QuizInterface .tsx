@@ -23,8 +23,7 @@ const QuizInterface = ({
   time: timeInMinutes,
 }: QuizInterfaceProps) => {
   const localizedText = getLocalizedText(language);
-  const titleFontClass = language === 'Arabic' ? 'font-semibold' : 'font-bold';
-  const arabicFontClass = language === 'Arabic' ? 'font-semibold' : '';
+  const commonTextClass = 'font-bold';
   const TOTAL_TIME = timeInMinutes * 60;
 
   const [quizStarted, setQuizStarted] = useState(false);
@@ -158,31 +157,35 @@ const QuizInterface = ({
 
   return (
     <div
-      className="mx-auto flex max-w-[50rem] select-none flex-col items-center rounded-3xl border bg-white p-6 shadow-md"
+      className={`mx-auto flex max-w-[50rem] select-none flex-col items-center rounded-3xl border bg-white p-6 shadow-md ${commonTextClass}`}
       dir={language === 'Arabic' ? 'rtl' : 'ltr'}
     >
       {!quizStarted ? (
         <>
           {/* Header */}
-          <h1 className={`text-center text-3xl ${titleFontClass}`}>
+          <h1 className={`text-center text-3xl ${commonTextClass}`}>
             {quizTitle}
           </h1>
 
           {/* Description */}
-          <p className="mt-4 text-center text-lg text-gray-600">
+          <p
+            className={`mt-4 text-center text-lg text-gray-600 ${commonTextClass}`}
+          >
             {localizedText.getReadyText} {localizedText.quizConsistsOfText}{' '}
-            <span className="font-semibold text-purple-600">
+            <span className="text-purple-600">
               {questions.length} {localizedText.questionsText}
             </span>
             , {localizedText.andYouHaveText}{' '}
-            <span className="font-semibold text-red-600">
+            <span className="text-red-600">
               {Math.floor(TOTAL_TIME / 60)} {localizedText.minutesText}
             </span>{' '}
             {localizedText.completeText}.
           </p>
 
           {/* Quiz Info */}
-          <div className="flex-between mt-6 w-full text-lg font-medium sm:px-6">
+          <div
+            className={`flex-between mt-6 w-full text-lg sm:px-6 ${commonTextClass}`}
+          >
             <p className="text-gray-700">
               📜 {questions.length} {localizedText.questionsLabel}
             </p>
@@ -200,7 +203,7 @@ const QuizInterface = ({
         <>
           {/* Header */}
           <div className="flex-between mb-4 w-full">
-            <h1 className={`text-2xl ${titleFontClass}`}>{quizTitle}</h1>
+            <h1 className={`text-2xl ${commonTextClass}`}>{quizTitle}</h1>
             <div className="text-sm font-medium text-red-600">
               {`${localizedText.timeLeftText} ${Math.floor(timeRemaining / 60)}:${('0' + (timeRemaining % 60)).slice(-2)}`}
             </div>
@@ -217,17 +220,17 @@ const QuizInterface = ({
           {quizSubmitted ? (
             <div className="w-full text-center">
               {/* Quiz Submitted Header */}
-              <h2 className="text-2xl font-semibold text-purple-700">
+              <h2 className={`text-2xl ${commonTextClass} text-purple-700`}>
                 {localizedText.quizCompletedText}
               </h2>
 
               {/* Score Display */}
-              <div className="mt-4 flex flex-col items-center">
-                <p className="text-lg font-medium">
-                  {localizedText.yourScoreText}
-                </p>
+              <div
+                className={`mt-4 flex flex-col items-center ${commonTextClass}`}
+              >
+                <p className="text-lg">{localizedText.yourScoreText}</p>
                 <div
-                  className={`mt-2 flex size-24 items-center justify-center rounded-full text-xl font-bold ${
+                  className={`mt-2 flex items-center justify-center rounded-full text-xl ${commonTextClass} ${
                     score / questions.length >= 0.7
                       ? 'bg-green-200 text-green-700'
                       : 'bg-red-200 text-red-700'
@@ -236,7 +239,7 @@ const QuizInterface = ({
                   {score} / {questions.length}
                 </div>
                 <p
-                  className={`mt-2 text-lg font-medium ${
+                  className={`mt-2 text-lg ${commonTextClass} ${
                     score / questions.length >= 0.7
                       ? 'text-green-600'
                       : 'text-red-600'
@@ -250,7 +253,7 @@ const QuizInterface = ({
 
               {/* Answer Review Section */}
               <div className="mt-6 w-full">
-                <h3 className="text-xl font-semibold text-gray-700">
+                <h3 className={`text-xl ${commonTextClass} text-gray-700`}>
                   {localizedText.reviewAnswersText}
                 </h3>
                 <div className="mt-4 space-y-4">
@@ -266,13 +269,13 @@ const QuizInterface = ({
                         key={idx}
                         className={`rounded-lg border p-4 ${getReviewClass(q)}`}
                       >
-                        <p className="font-medium text-gray-800">
+                        <p className={`text-gray-800 ${commonTextClass}`}>
                           {`${localizedText.questionLabel} ${idx + 1}: ${q.content}`}
                         </p>
                         {isMultipleChoice ? (
                           <>
                             <p className="mt-1 text-sm text-gray-600">
-                              <span className="font-semibold text-green-600">
+                              <span className="text-green-600">
                                 {localizedText.correctText}
                               </span>{' '}
                               {
@@ -282,9 +285,7 @@ const QuizInterface = ({
                               }
                             </p>
                             <p
-                              className={`mt-1 text-sm font-semibold ${
-                                isCorrect ? 'text-green-600' : 'text-red-600'
-                              }`}
+                              className={`mt-1 text-sm ${commonTextClass} ${isCorrect ? 'text-green-600' : 'text-red-600'}`}
                             >
                               {isCorrect
                                 ? localizedText.yourAnswerCorrectText
@@ -299,7 +300,7 @@ const QuizInterface = ({
                           <>
                             <p className="mt-1 text-sm text-gray-600">
                               <span
-                                className={`font-semibold ${isAiCorrect ? 'text-green-600' : 'text-red-600'}`}
+                                className={` ${commonTextClass} ${isAiCorrect ? 'text-green-600' : 'text-red-600'}`}
                               >
                                 {localizedText.yourAnswerText}
                               </span>{' '}
@@ -308,11 +309,7 @@ const QuizInterface = ({
                             </p>
                             {aiEvaluations[q.id] && (
                               <p
-                                className={`mt-1 text-sm font-semibold ${
-                                  isAiCorrect
-                                    ? 'text-green-600'
-                                    : 'text-red-600'
-                                }`}
+                                className={`mt-1 text-sm ${commonTextClass} ${isAiCorrect ? 'text-green-600' : 'text-red-600'}`}
                               >
                                 {localizedText.aiGradingText}{' '}
                                 {aiEvaluations[q.id].score} –{' '}
@@ -336,7 +333,7 @@ const QuizInterface = ({
             <>
               <div className="mb-6 w-full">
                 {/* Question Display */}
-                <h2 className="text-xl font-semibold">
+                <h2 className={`text-xl ${commonTextClass}`}>
                   {`${localizedText.questionText} ${currentQuestionIndex + 1}: ${currentQuestion.content}`}
                 </h2>
 
@@ -351,7 +348,7 @@ const QuizInterface = ({
                             ? 'default'
                             : 'outline'
                         }
-                        className={`${arabicFontClass} flex size-full justify-start whitespace-normal text-left`}
+                        className={`flex size-full justify-start whitespace-normal text-left ${commonTextClass}`}
                         disabled={loading}
                         onClick={() =>
                           !loading &&
