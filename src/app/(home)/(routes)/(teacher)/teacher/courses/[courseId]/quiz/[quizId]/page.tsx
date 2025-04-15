@@ -34,8 +34,8 @@ const QuizIdPage = async ({
         quizId={quizId}
         questions={questions}
         isPublished={quiz.isPublished}
-        language={quiz.language || ''}
-        time={quiz.timeInMinutes ?? 0}
+        language={quiz.language || 'English'}
+        time={quiz.timeInMinutes as number}
       />
     </>
   );

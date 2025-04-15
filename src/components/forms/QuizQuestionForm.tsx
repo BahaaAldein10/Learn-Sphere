@@ -201,7 +201,7 @@ const QuizQuestionForm = ({
         </Link>
 
         <QuizActions
-          disabled={!hasQuestion}
+          disabled={!hasQuestion || !language || !time}
           courseId={courseId}
           quizId={quizId}
           isPublished={isPublished}
