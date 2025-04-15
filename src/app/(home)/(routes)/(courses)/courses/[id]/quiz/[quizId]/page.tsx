@@ -19,6 +19,10 @@ const QuizIdPage = async ({
         questions={quiz.questions}
         language={quiz.language ?? 'English'}
         time={quiz.timeInMinutes ?? 30}
+        weightMCQ={quiz.defaultWeightMCQ}
+        weightTF={quiz.defaultWeightTF}
+        weightShort={quiz.defaultWeightShort}
+        criteria={quiz.criteria || ''}
       />
     </div>
   );

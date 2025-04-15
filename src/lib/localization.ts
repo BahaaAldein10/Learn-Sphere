@@ -77,7 +77,7 @@ export const getLocalizedText = (language: string): LocalizedText => {
       language === 'Arabic' ? 'مراجعة إجاباتك' : 'Review Your Answers',
     correctText: language === 'Arabic' ? '✅ الصحيح:' : '✅ Correct:',
     yourAnswerCorrectText:
-      language === 'Arabic' ? '✔ إجابتك صحيحة' : '✔ Your answer is correct',
+      language === 'Arabic' ? '✔ إجابة صحيحة' : '✔ Your answer is correct',
     yourAnswerIncorrectText:
       language === 'Arabic' ? '❌ إجابتك:' : '❌ Your Answer:',
     yourAnswerText: language === 'Arabic' ? '📝 إجابتك:' : '📝 Your Answer:',

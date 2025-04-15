@@ -233,6 +233,10 @@ export interface updateQuizConfigurationParams {
   quizTitle: string;
   language: string;
   time: number;
+  defaultWeightMCQ: number;
+  defaultWeightTF: number;
+  defaultWeightShort: number;
+  criteria: string;
 }
 
 export interface UpdateUserRoleParams {

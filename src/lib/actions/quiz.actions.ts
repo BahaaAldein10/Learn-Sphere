@@ -170,7 +170,16 @@ export async function updateQuizConfiguration(
   params: updateQuizConfigurationParams
 ) {
   try {
-    const { quizId, quizTitle, language, time } = params;
+    const {
+      quizId,
+      quizTitle,
+      language,
+      time,
+      defaultWeightMCQ,
+      defaultWeightTF,
+      defaultWeightShort,
+      criteria,
+    } = params;
 
     const quiz = await prisma.quiz.update({
       where: {
@@ -180,6 +189,10 @@ export async function updateQuizConfiguration(
         title: quizTitle,
         language,
         timeInMinutes: time,
+        defaultWeightMCQ,
+        defaultWeightTF,
+        defaultWeightShort,
+        criteria,
       },
     });
 
@@ -188,6 +201,7 @@ export async function updateQuizConfiguration(
     console.error(error);
   }
 }
+
 export async function publishQuiz(params: PublishQuizParams) {
   try {
     const { quizId, isPublished } = params;

@@ -25,6 +25,8 @@ export default function MenuBar({
     return null;
   }
 
+  const isArabic = language === 'Arabic';
+
   const Options = [
     {
       icon: <Heading1 className="size-5" />,
@@ -57,9 +59,18 @@ export default function MenuBar({
       preesed: editor.isActive('strike'),
     },
     {
-      icon: <AlignLeft className="size-5" />,
-      onClick: () => editor.chain().focus().setTextAlign('left').run(),
-      preesed: editor.isActive({ textAlign: 'left' }),
+      icon: isArabic ? (
+        <AlignRight className="size-5" />
+      ) : (
+        <AlignLeft className="size-5" />
+      ),
+      onClick: () =>
+        editor
+          .chain()
+          .focus()
+          .setTextAlign(isArabic ? 'right' : 'left')
+          .run(),
+      preesed: editor.isActive({ textAlign: isArabic ? 'right' : 'left' }),
     },
     {
       icon: <AlignCenter className="size-5" />,
@@ -67,9 +78,18 @@ export default function MenuBar({
       preesed: editor.isActive({ textAlign: 'center' }),
     },
     {
-      icon: <AlignRight className="size-5" />,
-      onClick: () => editor.chain().focus().setTextAlign('right').run(),
-      preesed: editor.isActive({ textAlign: 'right' }),
+      icon: isArabic ? (
+        <AlignLeft className="size-5" />
+      ) : (
+        <AlignRight className="size-5" />
+      ),
+      onClick: () =>
+        editor
+          .chain()
+          .focus()
+          .setTextAlign(isArabic ? 'left' : 'right')
+          .run(),
+      preesed: editor.isActive({ textAlign: isArabic ? 'left' : 'right' }),
     },
     {
       icon: <List className="size-5" />,
@@ -86,7 +106,7 @@ export default function MenuBar({
   return (
     <div
       className="z-50 mb-1 flex flex-wrap items-center gap-2 rounded-md border bg-white p-2"
-      dir={language === 'English' ? 'ltr' : 'rtl'}
+      dir={isArabic ? 'rtl' : 'ltr'}
     >
       {Options.map((option, index) => (
         <Toggle

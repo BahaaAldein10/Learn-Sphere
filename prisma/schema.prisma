@@ -36,10 +36,14 @@ model Quiz {
   courseId String @unique @db.ObjectId
   course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  title         String
-  isPublished   Boolean @default(false)
-  language      String?
-  timeInMinutes Int?
+  title              String
+  isPublished        Boolean @default(false)
+  language           String?
+  timeInMinutes      Int?
+  defaultWeightMCQ   Float   @default(1)
+  defaultWeightTF    Float   @default(1)
+  defaultWeightShort Float   @default(1)
+  criteria           String?
 
   questions QuizQuestion[]
 

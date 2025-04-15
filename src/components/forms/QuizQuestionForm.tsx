@@ -20,7 +20,7 @@ import { QuizOption, QuizQuestion } from '@prisma/client';
 import { ArrowLeft, Edit3, Pencil, Trash, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
@@ -55,7 +55,7 @@ const questionSchema = z
     correctAnswer: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.questionType && data.questionType !== 'SHORT_ANSWER') {
+    if (data.questionType !== 'SHORT_ANSWER') {
       if (!data.options || data.options.length < 2) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -80,6 +80,19 @@ const questionSchema = z
   });
 
 type QuestionFormValues = z.infer<typeof questionSchema>;
+interface QuizQuestionFormProps {
+  quizTitle: string;
+  courseId: string;
+  quizId: string;
+  questions: (QuizQuestion & { options: QuizOption[] })[];
+  isPublished: boolean;
+  language: string;
+  time: number;
+  weightMCQ: number;
+  weightTF: number;
+  weightShort: number;
+  criteria: string;
+}
 
 const QuizQuestionForm = ({
   quizTitle,
@@ -89,24 +102,30 @@ const QuizQuestionForm = ({
   isPublished,
   language,
   time,
-}: {
-  quizTitle: string;
-  courseId: string;
-  quizId: string;
-  questions: (QuizQuestion & { options: QuizOption[] })[];
-  isPublished: boolean;
-  language: string;
-  time: number;
-}) => {
+  weightMCQ,
+  weightTF,
+  weightShort,
+  criteria,
+}: QuizQuestionFormProps) => {
   const router = useRouter();
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(
     null
   );
+  const [isChanged, setIsChanged] = useState(false);
 
   const hasQuestion = questions.some(Boolean);
+  const isDisabled =
+    !hasQuestion ||
+    !language ||
+    !time ||
+    !weightMCQ ||
+    !weightTF ||
+    !weightShort ||
+    !criteria;
 
   const form = useForm<QuestionFormValues>({
     resolver: zodResolver(questionSchema),
+    mode: 'onChange',
     defaultValues: {
       questionText: '',
       questionType: '',
@@ -117,7 +136,37 @@ const QuizQuestionForm = ({
 
   const { handleSubmit, formState, reset, setValue, watch } = form;
   const { isSubmitting } = formState;
-  const questionType = watch('questionType');
+
+  const watchedText = watch('questionText');
+  const watchedType = watch('questionType');
+  const watchedOptions = watch('options');
+  const watchedCorrectAnswer = watch('correctAnswer');
+
+useEffect(() => {
+  if (editingQuestionId) {
+    const question = questions.find((q) => q.id === editingQuestionId);
+
+    const hasContentChanged = question?.content !== watchedText;
+    const hasTypeChanged = question?.type !== watchedType;
+    const optionsChanged =
+      question?.options.map((opt) => opt.content).join(',') !==
+      watchedOptions?.join(',');
+    const answerChanged =
+      question?.options.find((opt) => opt.isCorrect)?.content !==
+      watchedCorrectAnswer;
+
+    setIsChanged(
+      hasContentChanged || hasTypeChanged || optionsChanged || answerChanged
+    );
+  }
+}, [
+  editingQuestionId,
+  questions,
+  watchedText,
+  watchedType,
+  watchedOptions,
+  watchedCorrectAnswer,
+]);
 
   const resetFields = () =>
     reset({
@@ -186,8 +235,11 @@ const QuizQuestionForm = ({
           ? question.options.find((opt) => opt.isCorrect)?.content || ''
           : '',
     });
-    window.scrollTo({ top: isPublished ? 120 : 180, behavior: 'smooth' });
+    window.scrollTo({ top: isPublished ? 800 : 850, behavior: 'smooth' });
   };
+
+  const arabicTextClasses =
+    language === 'Arabic' ? 'text-sm font-arabic font-semibold' : '';
 
   return (
     <div className="p-6">
@@ -201,7 +253,7 @@ const QuizQuestionForm = ({
         </Link>
 
         <QuizActions
-          disabled={!hasQuestion || !language || !time}
+          disabled={isDisabled}
           courseId={courseId}
           quizId={quizId}
           isPublished={isPublished}
@@ -223,6 +275,10 @@ const QuizQuestionForm = ({
           quizId={quizId}
           language={language}
           time={time}
+          defaultWeightMCQ={weightMCQ}
+          defaultWeightTF={weightTF}
+          defaultWeightShort={weightShort}
+          criteria={criteria}
         />
 
         <div className="space-y-6">
@@ -238,7 +294,13 @@ const QuizQuestionForm = ({
                   <FormItem>
                     <FormLabel>Question Text</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter the question" />
+                      <Input
+                        {...field}
+                        placeholder="Enter the question"
+                        className={
+                          language === 'Arabic' ? arabicTextClasses : ''
+                        }
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -260,7 +322,7 @@ const QuizQuestionForm = ({
                           questionType: value,
                           options:
                             value === 'MCQ'
-                              ? []
+                              ? ['', '', '', '']
                               : value === 'TRUE_FALSE'
                                 ? language === 'English'
                                   ? ['True', 'False']
@@ -271,18 +333,33 @@ const QuizQuestionForm = ({
                       }}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger
+                          className={
+                            language === 'Arabic' ? arabicTextClasses : ''
+                          }
+                        >
                           <SelectValue placeholder="Select Question Type" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="MCQ">
+                        <SelectItem
+                          value="MCQ"
+                          className={
+                            language === 'Arabic' ? arabicTextClasses : ''
+                          }
+                        >
                           {language === 'English' ? 'MCQ' : 'إختيار متعدد'}
                         </SelectItem>
-                        <SelectItem value="TRUE_FALSE">
+                        <SelectItem
+                          value="TRUE_FALSE"
+                          className={arabicTextClasses}
+                        >
                           {language === 'English' ? 'True/False' : 'صح/خطأ'}
                         </SelectItem>
-                        <SelectItem value="SHORT_ANSWER">
+                        <SelectItem
+                          value="SHORT_ANSWER"
+                          className={arabicTextClasses}
+                        >
                           {language === 'English'
                             ? 'Short Answer'
                             : 'إجابة قصيرة'}
@@ -294,7 +371,7 @@ const QuizQuestionForm = ({
                 )}
               />
 
-              {questionType && questionType !== 'SHORT_ANSWER' && (
+              {watchedType && watchedType !== 'SHORT_ANSWER' && (
                 <>
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -302,10 +379,10 @@ const QuizQuestionForm = ({
                       {watch('options')?.map((_, index) => (
                         <div
                           key={index}
-                          className="flex items-center space-x-2"
+                          className={`flex items-center space-x-2 ${language === 'Arabic' && arabicTextClasses}`}
                         >
                           <FormControl>
-                            {questionType === 'MCQ' ? (
+                            {watchedType === 'MCQ' ? (
                               <div className="flex-center grow gap-4">
                                 <Input
                                   {...form.register(`options.${index}`)}
@@ -335,7 +412,7 @@ const QuizQuestionForm = ({
                       ))}
                     </div>
 
-                    {questionType === 'MCQ' &&
+                    {watchedType === 'MCQ' &&
                       (watch('options')?.length ?? 0) < 4 && (
                         <Button
                           type="button"
@@ -369,11 +446,19 @@ const QuizQuestionForm = ({
                           }
                         >
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger
+                              className={
+                                language === 'Arabic' ? arabicTextClasses : ''
+                              }
+                            >
                               <SelectValue placeholder="Select Correct Answer" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
+                          <SelectContent
+                            className={
+                              language === 'Arabic' ? arabicTextClasses : ''
+                            }
+                          >
                             {form
                               .watch('options')
                               ?.filter((option) => option.trim() !== '')
@@ -392,11 +477,19 @@ const QuizQuestionForm = ({
               )}
 
               <div className="flex items-center gap-2">
-                <Button type="submit" disabled={isSubmitting}>
-                  {editingQuestionId ? 'Update Question' : 'Add Question'}
-                </Button>
+                {editingQuestionId && (
+                  <Button type="submit" disabled={isSubmitting || !isChanged}>
+                    Update Question
+                  </Button>
+                )}
+                {!editingQuestionId && (
+                  <Button type="submit" disabled={isSubmitting}>
+                    Add Question
+                  </Button>
+                )}
                 {editingQuestionId && (
                   <Button
+                    disabled={isSubmitting}
                     onClick={() => {
                       resetFields();
                       setEditingQuestionId(null);

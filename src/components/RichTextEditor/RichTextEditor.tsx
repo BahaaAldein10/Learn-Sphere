@@ -19,6 +19,8 @@ const RichTextEditor = ({
   disabled = false,
   placeholder = 'Start typing here...',
 }: RichTextEditorProps) => {
+  const isArabic = language === 'Arabic';
+
   const editor = useEditor({
     content,
     editable: !disabled,
@@ -26,12 +28,12 @@ const RichTextEditor = ({
       StarterKit.configure({
         bulletList: {
           HTMLAttributes: {
-            class: `list-disc ${language === 'English' ? 'ml-3' : 'mr-3'}`,
+            class: `list-disc ${isArabic ? 'mr-3' : 'ml-3'}`,
           },
         },
         orderedList: {
           HTMLAttributes: {
-            class: `list-decimal ${language === 'English' ? 'ml-3' : 'mr-3'}`,
+            class: `list-decimal ${isArabic ? 'mr-3' : 'ml-3'}`,
           },
         },
       }),
@@ -42,7 +44,7 @@ const RichTextEditor = ({
         class:
           'min-h-[156px] border rounded-md bg-white py-2 px-3 focus-visible:ring-primary focus-visible:ring-2 focus:outline-none',
         spellCheck: 'true',
-        dir: language === 'English' ? 'ltr' : 'rtl',
+        dir: isArabic ? 'rtl' : 'ltr',
         placeholder,
       },
     },
@@ -52,8 +54,9 @@ const RichTextEditor = ({
   });
 
   useEffect(() => {
-    if (editor && content !== editor.getHTML())
+    if (editor && content !== editor.getHTML()) {
       editor.commands.setContent(content);
+    }
   }, [editor, content]);
 
   if (!editor) return null;

@@ -191,3 +191,10 @@ export function getUserColor(userId: string) {
   const colorIndex = sum % brightColors.length;
   return brightColors[colorIndex];
 }
+
+export function htmlToPlainText(html: string): string {
+  if (!html) return ''; // return empty string if undefined/null/empty
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  return tempDiv.textContent || tempDiv.innerText || '';
+}
