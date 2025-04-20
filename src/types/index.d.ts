@@ -180,11 +180,19 @@ export type CourseWithProgress = Course & { progress: number | null } & {
   category;
   chapters;
 };
+
 export type CoursesResult = {
   coursesWithProgress: CourseWithProgress[];
   pageSize: number;
   totalCount: number;
 };
+
+export interface RecommendationParams {
+  userId: string;
+  searchQuery?: string;
+  pageNumber?: number;
+  pageSize?: number;
+}
 
 export interface GetQuizParams {
   quizId: string;

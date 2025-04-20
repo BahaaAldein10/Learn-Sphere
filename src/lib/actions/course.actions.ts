@@ -12,10 +12,11 @@ import {
   PublishCourseParams,
   PurchaseWithCourse,
   PurchaseWithCourse2,
+  RecommendationParams,
   UpdateCourseParams,
 } from '@/types';
 import { auth } from '@clerk/nextjs/server';
-import { Category, Chapter, Course, Prisma, Purchase } from '@prisma/client';
+import { Category, Chapter, Course, Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import prisma from '../db';
 import { getProgress } from './chapter.actions';
@@ -24,27 +25,6 @@ type CourseWithProgressWithCategory = Course & {
   category: Category;
   chapters: Chapter[];
   progress: number | null;
-};
-
-type CourseWithProgress = {
-  name: string;
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  description: string | null;
-  isPublished: boolean;
-  clerkId: string;
-  imageUrl: string | null;
-  price: number | null;
-  categoryId: string | null;
-  category: {
-    name: string;
-    id: string;
-    createdAt: Date;
-    updatedAt: Date;
-  } | null;
-  purchases: Purchase[];
-  chapters: { id: string }[];
 };
 
 type DashboardCourses = {
@@ -472,7 +452,7 @@ export async function getAllCourses(
     ]);
 
     const coursesWithProgress = await Promise.all(
-      courses.map(async (course: CourseWithProgress) => {
+      courses.map(async (course) => {
         if (course.purchases.length === 0) {
           return {
             ...course,
@@ -500,35 +480,84 @@ export async function getAllCourses(
 }
 
 export async function getRecommendations(
-  params: GetAllCoursesParams
+  params: RecommendationParams
 ): Promise<CoursesResult> {
+  const { userId, searchQuery, pageNumber = 1, pageSize = 20 } = params;
+
   try {
-    const { userId, searchQuery, pageNumber = 1, pageSize = 20 } = params;
-    // Get liked questions for the user
-    const likedQuestions = await prisma.like.findMany({
-      where: { clerkId: userId },
-    });
+    const [
+      likes,
+      interactions,
+      askedQuestions,
+      answeredQuestions,
+      purchasedCourses,
+    ] = await Promise.all([
+      prisma.like.findMany({
+        where: { clerkId: userId },
+        include: { question: { select: { categoryId: true } } },
+      }),
+      prisma.interaction.findMany({
+        where: { clerkId: userId },
+        include: { question: { select: { categoryId: true } } },
+      }),
+      prisma.question.findMany({
+        where: { clerkId: userId },
+        select: { categoryId: true },
+      }),
+      prisma.answer.findMany({
+        where: { clerkId: userId },
+        include: { question: { select: { categoryId: true } } },
+      }),
+      prisma.purchase.findMany({
+        where: {
+          clerkId: userId,
+        },
+        include: {
+          course: { select: { categoryId: true } },
+        },
+      }),
+    ]);
 
-    // Return empty if no likes found
-    if (!likedQuestions.length)
-      return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
+    const likedCategoryIds = likes
+      .map((item) => item.question?.categoryId)
+      .filter(Boolean);
 
-    // Extract unique category IDs from liked questions
-    const likedQuestionIds = likedQuestions.map((q) => q.questionId);
-    const questions = await prisma.question.findMany({
-      where: { id: { in: likedQuestionIds } },
-      select: { categoryId: true },
-    });
-    const uniqueCategoryIds = Array.from(
-      new Set(questions.map((q) => q.categoryId))
+    const interactedCategoryIds = interactions
+      .map((item) => item.question?.categoryId)
+      .filter(Boolean);
+
+    const askedCategoryIds = askedQuestions
+      .map((item) => item.categoryId)
+      .filter(Boolean);
+
+    const answeredCategoryIds = answeredQuestions
+      .map((item) => item.question?.categoryId)
+      .filter(Boolean);
+
+    const purchasedCategoryIds = purchasedCourses
+      .map((item) => item.course?.categoryId)
+      .filter(Boolean);
+
+    const allCategoryIds = Array.from(
+      new Set([
+        ...likedCategoryIds,
+        ...interactedCategoryIds,
+        ...askedCategoryIds,
+        ...answeredCategoryIds,
+        ...purchasedCategoryIds,
+      ])
     );
 
-    // Fetch courses for each unique category with necessary relationships
+    if (allCategoryIds.length === 0)
+      return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
+
     const [courses, totalCount] = await prisma.$transaction([
       prisma.course.findMany({
         where: {
-          categoryId: { in: uniqueCategoryIds },
           isPublished: true,
+          categoryId: {
+            in: allCategoryIds.filter((id): id is string => id !== null),
+          },
           ...(searchQuery && {
             OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
           }),
@@ -536,24 +565,31 @@ export async function getRecommendations(
         include: {
           category: true,
           chapters: {
-            where: { isPublished: true },
-            select: { id: true },
+            where: {
+              isPublished: true,
+            },
+            select: {
+              id: true,
+            },
           },
           purchases: {
-            where: { clerkId: userId },
+            where: {
+              clerkId: userId,
+            },
           },
         },
         orderBy: {
-          createdAt: 'desc', // Ordering courses by newest created
+          createdAt: 'desc',
         },
         skip: (pageNumber - 1) * pageSize,
         take: pageSize,
       }),
-
       prisma.course.count({
         where: {
-          categoryId: { in: uniqueCategoryIds },
           isPublished: true,
+          categoryId: {
+            in: allCategoryIds.filter((id): id is string => id !== null),
+          },
           ...(searchQuery && {
             OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
           }),
@@ -561,16 +597,15 @@ export async function getRecommendations(
       }),
     ]);
 
-    // For each course, determine user progress or null if not purchased
     const coursesWithProgress = await Promise.all(
-      courses.map(async (course: CourseWithProgress) => {
+      courses.map(async (course) => {
         if (course.purchases.length === 0) {
           return {
             ...course,
             progress: null,
           };
         }
-
+        
         const progressPercentage = await getProgress({
           courseId: course.id,
           userId,
@@ -585,7 +620,7 @@ export async function getRecommendations(
 
     return { coursesWithProgress, pageSize, totalCount };
   } catch (error) {
-    console.log(error);
+    console.error('❌ Failed to get recommendations:', error);
     return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
   }
 }

@@ -244,8 +244,8 @@ model Interaction {
   id         String    @id @default(auto()) @map("_id") @db.ObjectId
   clerkId    String
   action     String
-  questionId String?   @db.ObjectId
-  question   Question? @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId String   @db.ObjectId
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
   createdAt  DateTime  @default(now())
 
   @@index([questionId, clerkId, action])
