@@ -116,7 +116,7 @@ const QuizInterface = ({
       }));
 
       // Send all questions to the API
-      const res = await fetch('/api/grade', {
+      const res = await fetch('/api/quiz/grade', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

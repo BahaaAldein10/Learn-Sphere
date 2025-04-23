@@ -40,9 +40,9 @@ model Quiz {
   isPublished        Boolean @default(false)
   language           String?
   timeInMinutes      Int?
-  defaultWeightMCQ   Float   @default(1)
-  defaultWeightTF    Float   @default(1)
-  defaultWeightShort Float   @default(1)
+  defaultWeightMCQ   Float?
+  defaultWeightTF    Float?
+  defaultWeightShort Float?
   criteria           String?
 
   questions QuizQuestion[]
@@ -241,12 +241,12 @@ model DisLike {
 }
 
 model Interaction {
-  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
   clerkId    String
   action     String
   questionId String   @db.ObjectId
   question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  createdAt  DateTime  @default(now())
+  createdAt  DateTime @default(now())
 
   @@index([questionId, clerkId, action])
 }

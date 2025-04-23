@@ -15,14 +15,14 @@ const QuizIdPage = async ({
   return (
     <div className="p-6">
       <QuizInterface
-        quizTitle={quiz?.title as string}
+        quizTitle={quiz.title}
         questions={quiz.questions}
-        language={quiz.language ?? 'English'}
-        time={quiz.timeInMinutes ?? 30}
-        weightMCQ={quiz.defaultWeightMCQ}
-        weightTF={quiz.defaultWeightTF}
-        weightShort={quiz.defaultWeightShort}
-        criteria={quiz.criteria || ''}
+        language={quiz.language!}
+        time={quiz.timeInMinutes!}
+        weightMCQ={quiz.defaultWeightMCQ!}
+        weightTF={quiz.defaultWeightTF!}
+        weightShort={quiz.defaultWeightShort!}
+        criteria={quiz.criteria!}
       />
     </div>
   );

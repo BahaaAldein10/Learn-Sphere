@@ -189,7 +189,7 @@ const QuizConfigurationForm = ({
                   <Label>Language</Label>
                   <FormControl>
                     <Select
-                      value={field.value}
+                      value={field.value || ''}
                       onValueChange={field.onChange}
                       disabled={isSubmitting}
                     >

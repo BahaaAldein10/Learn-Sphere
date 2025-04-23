@@ -24,6 +24,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { z } from 'zod';
+import AIQuizGenerator from '../shared/AIQuizGenerator';
 import ConfirmModal from '../shared/ConfirmModal';
 import {
   Select,
@@ -114,14 +115,13 @@ const QuizQuestionForm = ({
   const [isChanged, setIsChanged] = useState(false);
 
   const hasQuestion = questions.some(Boolean);
-  const isDisabled =
-    !hasQuestion ||
-    !language ||
-    !time ||
-    !weightMCQ ||
-    !weightTF ||
-    !weightShort ||
-    !criteria;
+  const hasRequiredConfig =
+    !!language &&
+    !!time &&
+    !!weightMCQ &&
+    !!weightTF &&
+    !!weightShort &&
+    !!criteria;
 
   const form = useForm<QuestionFormValues>({
     resolver: zodResolver(questionSchema),
@@ -142,39 +142,41 @@ const QuizQuestionForm = ({
   const watchedOptions = watch('options');
   const watchedCorrectAnswer = watch('correctAnswer');
 
-useEffect(() => {
-  if (editingQuestionId) {
-    const question = questions.find((q) => q.id === editingQuestionId);
+  useEffect(() => {
+    if (editingQuestionId) {
+      const question = questions.find((q) => q.id === editingQuestionId);
 
-    const hasContentChanged = question?.content !== watchedText;
-    const hasTypeChanged = question?.type !== watchedType;
-    const optionsChanged =
-      question?.options.map((opt) => opt.content).join(',') !==
-      watchedOptions?.join(',');
-    const answerChanged =
-      question?.options.find((opt) => opt.isCorrect)?.content !==
-      watchedCorrectAnswer;
+      const hasContentChanged = question?.content !== watchedText;
+      const hasTypeChanged = question?.type !== watchedType;
+      const optionsChanged =
+        question?.options.map((opt) => opt.content).join(',') !==
+        watchedOptions?.join(',');
+      const answerChanged =
+        question?.options.find((opt) => opt.isCorrect)?.content !==
+        watchedCorrectAnswer;
 
-    setIsChanged(
-      hasContentChanged || hasTypeChanged || optionsChanged || answerChanged
-    );
-  }
-}, [
-  editingQuestionId,
-  questions,
-  watchedText,
-  watchedType,
-  watchedOptions,
-  watchedCorrectAnswer,
-]);
+      setIsChanged(
+        hasContentChanged || hasTypeChanged || optionsChanged || answerChanged
+      );
+    }
+  }, [
+    editingQuestionId,
+    questions,
+    watchedText,
+    watchedType,
+    watchedOptions,
+    watchedCorrectAnswer,
+  ]);
 
-  const resetFields = () =>
+  const resetFields = () => {
     reset({
       questionText: '',
       questionType: '',
       options: [],
       correctAnswer: '',
     });
+    setEditingQuestionId(null);
+  };
 
   const handleAddOrUpdateQuestion = async (values: QuestionFormValues) => {
     const payload = {
@@ -253,7 +255,7 @@ useEffect(() => {
         </Link>
 
         <QuizActions
-          disabled={isDisabled}
+          disabled={!hasRequiredConfig || !hasQuestion}
           courseId={courseId}
           quizId={quizId}
           isPublished={isPublished}
@@ -280,6 +282,52 @@ useEffect(() => {
           defaultWeightShort={weightShort}
           criteria={criteria}
         />
+
+        {!hasRequiredConfig && (
+          <div className="mt-4 rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 shadow-sm">
+            <div className="flex items-start space-x-3">
+              <svg
+                className="size-5 shrink-0 text-yellow-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M12 9v2m0 4h.01M12 5.5a7.5 7.5 0 017.5 7.5 7.5 7.5 0 11-15 0 7.5 7.5 0 017.5-7.5z"
+                />
+              </svg>
+
+              <div className="space-y-2 text-sm text-yellow-900">
+                <p className="font-medium">Complete quiz configuration</p>
+                <p>
+                  To get the <strong>best AI experience</strong> and to be able
+                  to <strong>publish your quiz</strong>, please select a
+                  language, time, weights, and criteria above.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-between mt-6">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full bg-purple-200 p-1">
+              <Edit3 color="#581c87" className="size-6" />
+            </div>
+            <h2 className="text-xl font-medium">Generate or Add Questions</h2>
+          </div>
+
+          <AIQuizGenerator
+            quizId={quizId}
+            language={language}
+            disabled={!hasRequiredConfig}
+          />
+        </div>
 
         <div className="space-y-6">
           <Form {...form}>

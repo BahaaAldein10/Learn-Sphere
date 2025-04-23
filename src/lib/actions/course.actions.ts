@@ -485,6 +485,7 @@ export async function getRecommendations(
   const { userId, searchQuery, pageNumber = 1, pageSize = 20 } = params;
 
   try {
+    // 1. Fetch user behavior data in parallel
     const [
       likes,
       interactions,
@@ -509,87 +510,76 @@ export async function getRecommendations(
         include: { question: { select: { categoryId: true } } },
       }),
       prisma.purchase.findMany({
-        where: {
-          clerkId: userId,
-        },
-        include: {
-          course: { select: { categoryId: true } },
-        },
+        where: { clerkId: userId },
+        include: { course: { select: { categoryId: true } } },
       }),
     ]);
 
-    const likedCategoryIds = likes
-      .map((item) => item.question?.categoryId)
-      .filter(Boolean);
+    // 2. Define weights for each action type
+    const ACTION_WEIGHTS: Record<string, number> = {
+      like: 3,
+      interaction: 2,
+      ask: 1,
+      answer: 4,
+      purchase: 5,
+    };
 
-    const interactedCategoryIds = interactions
-      .map((item) => item.question?.categoryId)
-      .filter(Boolean);
+    // 3. Accumulate category scores based on behaviors
+    const categoryScores: Record<string, number> = {};
 
-    const askedCategoryIds = askedQuestions
-      .map((item) => item.categoryId)
-      .filter(Boolean);
+    likes.forEach((item) => {
+      const id = item.question?.categoryId;
+      if (id)
+        categoryScores[id] = (categoryScores[id] || 0) + ACTION_WEIGHTS.like;
+    });
+    interactions.forEach((item) => {
+      const id = item.question?.categoryId;
+      if (id)
+        categoryScores[id] =
+          (categoryScores[id] || 0) + ACTION_WEIGHTS.interaction;
+    });
+    askedQuestions.forEach((item) => {
+      const id = item.categoryId;
+      if (id)
+        categoryScores[id] = (categoryScores[id] || 0) + ACTION_WEIGHTS.ask;
+    });
+    answeredQuestions.forEach((item) => {
+      const id = item.question?.categoryId;
+      if (id)
+        categoryScores[id] = (categoryScores[id] || 0) + ACTION_WEIGHTS.answer;
+    });
+    purchasedCourses.forEach((item) => {
+      const id = item.course?.categoryId;
+      if (id)
+        categoryScores[id] =
+          (categoryScores[id] || 0) + ACTION_WEIGHTS.purchase;
+    });
 
-    const answeredCategoryIds = answeredQuestions
-      .map((item) => item.question?.categoryId)
-      .filter(Boolean);
-
-    const purchasedCategoryIds = purchasedCourses
-      .map((item) => item.course?.categoryId)
-      .filter(Boolean);
-
-    const allCategoryIds = Array.from(
-      new Set([
-        ...likedCategoryIds,
-        ...interactedCategoryIds,
-        ...askedCategoryIds,
-        ...answeredCategoryIds,
-        ...purchasedCategoryIds,
-      ])
-    );
-
-    if (allCategoryIds.length === 0)
+    const allCategoryIds = Object.keys(categoryScores);
+    if (allCategoryIds.length === 0) {
       return { coursesWithProgress: [], pageSize: 0, totalCount: 0 };
+    }
 
+    // 4. Fetch all matching courses
     const [courses, totalCount] = await prisma.$transaction([
       prisma.course.findMany({
         where: {
           isPublished: true,
-          categoryId: {
-            in: allCategoryIds.filter((id): id is string => id !== null),
-          },
+          categoryId: { in: allCategoryIds },
           ...(searchQuery && {
             OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
           }),
         },
         include: {
           category: true,
-          chapters: {
-            where: {
-              isPublished: true,
-            },
-            select: {
-              id: true,
-            },
-          },
-          purchases: {
-            where: {
-              clerkId: userId,
-            },
-          },
+          chapters: { where: { isPublished: true }, select: { id: true } },
+          purchases: { where: { clerkId: userId } },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
-        skip: (pageNumber - 1) * pageSize,
-        take: pageSize,
       }),
       prisma.course.count({
         where: {
           isPublished: true,
-          categoryId: {
-            in: allCategoryIds.filter((id): id is string => id !== null),
-          },
+          categoryId: { in: allCategoryIds },
           ...(searchQuery && {
             OR: [{ name: { contains: searchQuery, mode: 'insensitive' } }],
           }),
@@ -597,26 +587,35 @@ export async function getRecommendations(
       }),
     ]);
 
-    const coursesWithProgress = await Promise.all(
-      courses.map(async (course) => {
-        if (course.purchases.length === 0) {
-          return {
-            ...course,
-            progress: null,
-          };
-        }
-        
-        const progressPercentage = await getProgress({
-          courseId: course.id,
-          userId,
-        });
+    // 5. Attach weights and sort courses by descending score, then by recency
+    const coursesWithWeights = courses
+      .map((course) => ({
+        ...course,
+        _score: categoryScores[course.categoryId!] || 0,
+      }))
+      .sort((a, b) => {
+        // Primary: weight score
+        if (b._score !== a._score) return b._score - a._score;
+        // Secondary: newer courses first
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
 
-        return {
-          ...course,
-          progress: progressPercentage,
-        };
+    // 6. Paginate in-memory
+    const skip = (pageNumber - 1) * pageSize;
+    const paginatedCourses = coursesWithWeights.slice(skip, skip + pageSize);
+
+    // 7. Compute progress for each paginated course
+    const coursesWithProgress = await Promise.all(
+      paginatedCourses.map(async (course) => {
+        if (course.purchases.length === 0) {
+          return { ...course, progress: null };
+        }
+        const progress = await getProgress({ courseId: course.id, userId });
+        return { ...course, progress };
       })
     );
+
+    console.log(coursesWithProgress)
 
     return { coursesWithProgress, pageSize, totalCount };
   } catch (error) {

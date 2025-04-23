@@ -198,3 +198,15 @@ export function htmlToPlainText(html: string): string {
   tempDiv.innerHTML = html;
   return tempDiv.textContent || tempDiv.innerText || '';
 }
+
+export function applyScores(
+  ids: (string | null)[],
+  weight: number,
+  score: Record<string, number>
+) {
+  ids.forEach((id) => {
+    if (id) {
+      score[id] = (score[id] || 0) + weight;
+    }
+  });
+}
