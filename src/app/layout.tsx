@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: 'Learn Sphere',
   description: 'AI-Powered Collaborative Learning Platform',
   icons: {
-    icon: '/assets/logo.png',
+    icon: [{ url: '/assets/logo.png' }],
   },
 };
 
