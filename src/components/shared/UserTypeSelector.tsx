@@ -27,7 +27,7 @@ const UserTypeSelector = ({
       <SelectTrigger className="no-focus w-fit bg-gray-100">
         <SelectValue />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className='z-[999]'>
         <SelectItem value="viewer">can view</SelectItem>
         <SelectItem value="editor">can edit</SelectItem>
       </SelectContent>

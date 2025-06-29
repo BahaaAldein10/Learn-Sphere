@@ -105,62 +105,68 @@ const QuizInterface = ({
   const handleSubmit = async () => {
     setLoading(true);
 
-    try {
-      // Prepare all questions for evaluation
-      const questionsPayload = questions.map((q) => ({
-        id: q.id,
-        question: q.content,
-        answer: selectedAnswers[q.id] || '',
-        type: q.type,
-        correctOptionId: q.options.find((o) => o.isCorrect)?.id,
-      }));
+    const maxRetries = 3;
+    let attempt = 0;
+    let success = false;
 
-      // Send all questions to the API
-      const res = await fetch('/api/quiz/grade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          questions: questionsPayload,
-          language,
-          defaultWeightMCQ: weightMCQ,
-          defaultWeightTF: weightTF,
-          defaultWeightShort: weightShort,
-          criteria,
-        }),
-      });
+    while (attempt < maxRetries && !success) {
+      try {
+        attempt++;
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const questionsPayload = questions.map((q) => ({
+          id: q.id,
+          question: q.content,
+          answer: selectedAnswers[q.id] || '',
+          type: q.type,
+          correctOptionId: q.options.find((o) => o.isCorrect)?.id,
+        }));
 
-      const data = await res.json();
+        const res = await fetch('/api/quiz/grade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            questions: questionsPayload,
+            language,
+            defaultWeightMCQ: weightMCQ,
+            defaultWeightTF: weightTF,
+            defaultWeightShort: weightShort,
+            criteria,
+          }),
+        });
 
-      // Map results to questions
-      const resultsMap: Record<string, EvalResult> = {};
-      data.results.forEach((result: EvalResult) => {
-        resultsMap[result.id] = result;
-      });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      // Update state with results
-      setQuestionResults(resultsMap);
-      setOverallScore(data.overallScore);
+        const data = await res.json();
 
-      // Calculate raw score for the simple score display (number correct out of total)
-      let rawScoreCount = 0;
-      Object.values(resultsMap).forEach((result) => {
-        if (result.rawScore >= 0.7) {
-          rawScoreCount++;
+        const resultsMap: Record<string, EvalResult> = {};
+        data.results.forEach((result: EvalResult) => {
+          resultsMap[result.id] = result;
+        });
+
+        setQuestionResults(resultsMap);
+        setOverallScore(data.overallScore);
+
+        const rawScoreCount = Object.values(resultsMap).filter(
+          (r) => r.rawScore >= 0.7
+        ).length;
+
+        setScore(rawScoreCount);
+        success = true;
+      } catch (error) {
+        console.error(`Attempt ${attempt} failed:`, error);
+        if (attempt === maxRetries) {
+          toast.error(localizedText.shortAnswerErrorText);
+        } else {
+          // Optional: Add delay before retry (basic backoff)
+          await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
         }
-      });
-
-      setScore(rawScoreCount);
-    } catch (error) {
-      console.error('Error grading answers:', error);
-      toast.error(localizedText.shortAnswerErrorText);
+      }
     }
 
     setLoading(false);
     setQuizSubmitted(true);
   };
-
+  
   const handleRetakeQuiz = () => {
     setQuizStarted(false);
     setQuizSubmitted(false);

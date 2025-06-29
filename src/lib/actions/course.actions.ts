@@ -615,8 +615,6 @@ export async function getRecommendations(
       })
     );
 
-    console.log(coursesWithProgress)
-
     return { coursesWithProgress, pageSize, totalCount };
   } catch (error) {
     console.error('❌ Failed to get recommendations:', error);

@@ -67,7 +67,7 @@ const formSchema = z.object({
   criteria: z
     .string()
     .min(5, { message: 'Please define criteria for short-answer questions' })
-    .max(300, { message: 'Description must be 300 characters or less' }),
+    .max(2000, { message: 'Description must be 1000 characters or less' }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
